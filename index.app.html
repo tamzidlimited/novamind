@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaMind — The Complete Business OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Mulish:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#050709;--s1:#0a0c12;--s2:#0e1118;--s3:#131720;--s4:#181e2b;--s5:#1e2538;
+  --a1:#39ff9e;--a2:#00d4ff;--a3:#ff6b6b;--a4:#ffd166;--a5:#c77dff;
+  --wa:#25d366;--ig:#e1306c;--fb:#1877f2;--web:#f59e0b;--sms:#a78bfa;
+  --text:#edf0fa;--muted:#3d4560;--muted2:#606880;--muted3:#8892b0;
+  --border:rgba(57,255,158,0.07);--border2:rgba(255,255,255,0.06);
+  --glow:rgba(57,255,158,0.15);--r:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;font-family:'Mulish',sans-serif;background:var(--bg);color:var(--text);}
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-thumb{background:var(--s5);border-radius:3px;}
+
+/* ─── NOISE OVERLAY ─── */
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.025;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:200px;}
+
+/* ─── LAYOUT ─── */
+.shell{display:flex;height:100%;position:relative;z-index:1;}
+
+/* ─── RAIL ─── */
+.rail{
+  width:58px;flex-shrink:0;background:var(--s1);
+  border-right:1px solid var(--border2);
+  display:flex;flex-direction:column;align-items:center;
+  padding:12px 0;gap:4px;z-index:10;
+}
+.rail-logo{
+  width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(135deg,var(--a1),var(--a2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:.85rem;font-weight:900;color:#050709;
+  font-family:'Bricolage Grotesque',sans-serif;
+  margin-bottom:14px;flex-shrink:0;
+}
+.rail-btn{
+  width:40px;height:40px;border-radius:11px;border:none;
+  background:transparent;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;transition:.2s;position:relative;color:var(--muted2);
+}
+.rail-btn:hover{background:var(--s3);color:var(--text);}
+.rail-btn.active{background:rgba(57,255,158,0.1);color:var(--a1);}
+.rail-btn .rb-badge{
+  position:absolute;top:1px;right:1px;min-width:14px;height:14px;
+  border-radius:7px;background:var(--a3);color:white;
+  font-size:.58rem;font-weight:700;display:flex;align-items:center;
+  justify-content:center;padding:0 3px;border:1px solid var(--bg);
+}
+.rail-spacer{flex:1;}
+.rail-avatar{
+  width:30px;height:30px;border-radius:50%;
+  background:linear-gradient(135deg,var(--a1),var(--a5));
+  display:flex;align-items:center;justify-content:center;
+  font-size:.72rem;font-weight:800;color:#050709;cursor:pointer;
+}
+
+/* ─── MAIN ─── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+/* ─── TOPBAR ─── */
+.topbar{
+  height:50px;flex-shrink:0;background:var(--s1);
+  border-bottom:1px solid var(--border2);
+  display:flex;align-items:center;padding:0 20px;gap:12px;
+}
+.tb-title{font-family:'Bricolage Grotesque',sans-serif;font-size:.95rem;font-weight:700;flex:1;}
+.tb-title span{color:var(--a1);}
+.tb-pills{display:flex;gap:8px;}
+.tb-pill{
+  display:flex;align-items:center;gap:5px;
+  background:var(--s3);border:1px solid var(--border2);
+  border-radius:50px;padding:4px 12px;font-size:.72rem;color:var(--muted3);
+  cursor:pointer;transition:.2s;
+}
+.tb-pill:hover{border-color:rgba(57,255,158,0.2);color:var(--a1);}
+.tb-pill .dot{width:5px;height:5px;border-radius:50%;}
+.green-dot{background:var(--a1);animation:glow 1.5s infinite;}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(57,255,158,.5);}50%{box-shadow:0 0 0 4px rgba(57,255,158,0);}}
+
+/* ─── PAGE CONTENT ─── */
+.page{display:none;flex:1;overflow:hidden;}
+.page.active{display:flex;}
+
+/* ════════════════════════════════
+   PAGE 1 — OVERVIEW DASHBOARD
+════════════════════════════════ */
+#pg-overview{flex-direction:column;overflow-y:auto;padding:24px;}
+
+.ov-welcome{
+  background:linear-gradient(135deg,rgba(57,255,158,0.06),rgba(0,212,255,0.04));
+  border:1px solid var(--border);border-radius:20px;
+  padding:28px 32px;margin-bottom:24px;
+  display:flex;align-items:center;gap:24px;position:relative;overflow:hidden;
+}
+.ov-welcome::before{
+  content:'';position:absolute;right:-60px;top:-60px;
+  width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(57,255,158,0.08),transparent 70%);
+}
+.ov-welcome-text h2{font-family:'Bricolage Grotesque',sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:6px;}
+.ov-welcome-text p{color:var(--muted3);font-size:.88rem;line-height:1.6;}
+.ov-url-mini{
+  flex:1;display:flex;gap:10px;align-items:center;max-width:460px;
+  background:var(--s3);border:1px solid var(--border2);border-radius:12px;
+  padding:8px 8px 8px 14px;
+}
+.ov-url-mini input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:.85rem;font-family:'Mulish',sans-serif;}
+.ov-url-mini input::placeholder{color:var(--muted2);}
+.ov-url-mini button{
+  background:linear-gradient(135deg,var(--a1),var(--a2));border:none;
+  border-radius:9px;padding:9px 18px;font-size:.8rem;font-weight:700;
+  color:#050709;cursor:pointer;white-space:nowrap;transition:.2s;
+  font-family:'Bricolage Grotesque',sans-serif;
+}
+.ov-url-mini button:hover{transform:scale(1.03);}
+
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.kpi{
+  background:var(--s2);border:1px solid var(--border2);border-radius:16px;
+  padding:20px;transition:.25s;cursor:pointer;
+}
+.kpi:hover{transform:translateY(-2px);border-color:rgba(57,255,158,0.15);}
+.kpi-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+.kpi-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.9rem;}
+.kpi-change{font-size:.72rem;padding:2px 8px;border-radius:50px;}
+.up{background:rgba(57,255,158,0.1);color:var(--a1);}
+.down{background:rgba(255,107,107,0.1);color:var(--a3);}
+.kpi-val{font-family:'Bricolage Grotesque',sans-serif;font-size:1.9rem;font-weight:800;line-height:1;margin-bottom:4px;}
+.kpi-lbl{font-size:.75rem;color:var(--muted3);}
+
+.ov-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+.ov-card{background:var(--s2);border:1px solid var(--border2);border-radius:16px;padding:20px;overflow:hidden;}
+.ov-card-title{font-family:'Bricolage Grotesque',sans-serif;font-size:.85rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+.ov-card-title a{font-size:.72rem;color:var(--a1);cursor:pointer;font-weight:400;font-family:'Mulish',sans-serif;}
+
+.ch-bars{display:flex;flex-direction:column;gap:10px;}
+.ch-bar-row{display:flex;align-items:center;gap:10px;}
+.ch-bar-label{width:90px;font-size:.78rem;color:var(--muted3);flex-shrink:0;}
+.ch-bar-track{flex:1;height:6px;background:var(--s4);border-radius:6px;overflow:hidden;}
+.ch-bar-fill{height:100%;border-radius:6px;transition:width 1s ease;}
+.ch-bar-val{font-size:.75rem;font-weight:600;width:30px;text-align:right;flex-shrink:0;}
+
+.activity-list{display:flex;flex-direction:column;gap:0;}
+.act-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.03);align-items:flex-start;}
+.act-item:last-child{border-bottom:none;}
+.act-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0;}
+.act-text{flex:1;font-size:.78rem;line-height:1.5;}
+.act-text strong{color:var(--text);}
+.act-time{font-size:.68rem;color:var(--muted);flex-shrink:0;}
+
+.clients-table{width:100%;border-collapse:collapse;}
+.clients-table th{text-align:left;padding:8px 10px;font-size:.7rem;color:var(--muted2);border-bottom:1px solid var(--border2);text-transform:uppercase;letter-spacing:.05em;}
+.clients-table td{padding:10px 10px;font-size:.8rem;border-bottom:1px solid rgba(255,255,255,0.03);}
+.clients-table tr:last-child td{border-bottom:none;}
+.clients-table tr:hover td{background:rgba(255,255,255,.015);}
+.status-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:50px;font-size:.68rem;}
+.s-active{background:rgba(57,255,158,0.1);color:var(--a1);}
+.s-setup{background:rgba(255,209,102,0.1);color:var(--a4);}
+.s-paused{background:rgba(255,107,107,0.1);color:var(--a3);}
+
+/* ════════════════════════════════
+   PAGE 2 — AI LAUNCHER
+════════════════════════════════ */
+#pg-launch{flex-direction:column;overflow-y:auto;padding:24px;}
+
+.launch-hero{
+  text-align:center;padding:40px 20px 32px;
+}
+.launch-badge{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(57,255,158,0.07);border:1px solid rgba(57,255,158,0.15);
+  border-radius:50px;padding:5px 14px;font-size:.75rem;color:var(--a1);
+  margin-bottom:20px;
+}
+.launch-hero h1{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(2rem,4vw,3.2rem);font-weight:800;line-height:1.1;margin-bottom:14px;}
+.launch-hero h1 em{color:var(--a1);font-style:normal;}
+.launch-hero p{color:var(--muted3);font-size:.95rem;max-width:480px;margin:0 auto 32px;line-height:1.7;}
+
+.url-card{
+  max-width:680px;margin:0 auto 28px;
+  background:var(--s2);border:1px solid var(--border);border-radius:20px;
+  padding:10px 10px 10px 20px;display:flex;gap:10px;align-items:center;
+  box-shadow:0 0 40px rgba(57,255,158,0.04);transition:.3s;
+}
+.url-card:focus-within{border-color:rgba(57,255,158,0.3);box-shadow:0 0 0 4px rgba(57,255,158,0.05),0 20px 60px rgba(0,0,0,.3);}
+.url-card input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:.95rem;font-family:'Mulish',sans-serif;}
+.url-card input::placeholder{color:var(--muted2);}
+.url-card button{
+  background:linear-gradient(135deg,var(--a1),var(--a2));border:none;
+  border-radius:14px;padding:14px 28px;font-size:.92rem;font-weight:800;
+  color:#050709;cursor:pointer;transition:.2s;
+  font-family:'Bricolage Grotesque',sans-serif;display:flex;align-items:center;gap:8px;
+}
+.url-card button:hover{transform:scale(1.02);box-shadow:0 8px 30px var(--glow);}
+.url-card button:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+
+.demo-chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:32px;}
+.demo-chip{
+  background:var(--s3);border:1px solid var(--border2);border-radius:50px;
+  padding:6px 14px;font-size:.78rem;color:var(--muted3);cursor:pointer;transition:.2s;
+}
+.demo-chip:hover{border-color:rgba(57,255,158,0.25);color:var(--a1);}
+
+/* progress */
+#launch-progress{display:none;max-width:680px;margin:0 auto 28px;}
+.lp-card{background:var(--s2);border:1px solid var(--border);border-radius:20px;padding:28px 32px;}
+.lp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.lp-title{font-family:'Bricolage Grotesque',sans-serif;font-size:1rem;font-weight:700;}
+.lp-pct{font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:800;color:var(--a1);}
+.lp-track{height:5px;background:var(--s4);border-radius:5px;overflow:hidden;margin-bottom:18px;}
+.lp-fill{height:100%;background:linear-gradient(90deg,var(--a1),var(--a2));border-radius:5px;transition:width .6s ease;width:0%;}
+.lp-steps{display:flex;gap:0;}
+.lp-step{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;}
+.lp-dot{width:26px;height:26px;border-radius:50%;border:1px solid var(--border2);background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:.65rem;transition:.3s;color:var(--muted2);}
+.lp-dot.active{background:var(--a1);color:#050709;border-color:var(--a1);box-shadow:0 0 10px rgba(57,255,158,0.4);}
+.lp-dot.done{background:rgba(57,255,158,0.15);color:var(--a1);border-color:rgba(57,255,158,0.3);}
+.lp-step-lbl{font-size:.62rem;color:var(--muted2);text-align:center;max-width:60px;}
+
+.lp-log{background:var(--s3);border-radius:10px;padding:12px;max-height:120px;overflow-y:auto;margin-top:14px;font-size:.75rem;font-family:monospace;}
+.ll{padding:3px 0;display:flex;gap:8px;}
+.ll-t{color:var(--muted);}
+.ll-m{color:var(--text);}
+.ll-m.ok{color:var(--a1);}
+.ll-m.go{color:var(--a2);}
+
+/* results tabs */
+#launch-results{display:none;max-width:960px;margin:0 auto;}
+.res-biz{
+  background:var(--s2);border:1px solid var(--border);border-radius:18px;
+  padding:24px;margin-bottom:18px;display:flex;gap:20px;align-items:center;
+}
+.res-emoji{width:60px;height:60px;border-radius:14px;background:linear-gradient(135deg,rgba(57,255,158,0.12),rgba(0,212,255,0.08));display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0;}
+.res-name{font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:4px;}
+.res-type{display:inline-block;background:rgba(57,255,158,0.08);border:1px solid var(--border);border-radius:50px;padding:2px 10px;font-size:.72rem;color:var(--a1);margin-bottom:8px;}
+.res-desc{font-size:.84rem;color:var(--muted3);line-height:1.6;}
+.res-proj{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;}
+.rp-chip{background:var(--s4);border-radius:8px;padding:8px 14px;text-align:center;}
+.rp-chip-val{font-family:'Bricolage Grotesque',sans-serif;font-size:1.1rem;font-weight:800;color:var(--a1);}
+.rp-chip-lbl{font-size:.68rem;color:var(--muted2);}
+
+.res-tabs{display:flex;gap:4px;background:var(--s2);border:1px solid var(--border2);border-radius:12px;padding:4px;margin-bottom:16px;flex-wrap:wrap;}
+.rtab{padding:8px 16px;border-radius:9px;border:none;background:transparent;color:var(--muted2);font-family:'Mulish',sans-serif;font-size:.8rem;cursor:pointer;transition:.2s;white-space:nowrap;}
+.rtab.active{background:rgba(57,255,158,0.1);color:var(--a1);border:1px solid rgba(57,255,158,0.15);}
+.rtab-panel{display:none;}
+.rtab-panel.active{display:block;}
+
+/* funnel preview */
+.funnel-mock{background:var(--s3);border:1px solid var(--border2);border-radius:16px;overflow:hidden;}
+.fm-bar{background:rgba(57,255,158,0.05);border-bottom:1px solid var(--border2);padding:10px 16px;display:flex;align-items:center;gap:8px;}
+.fm-dots{display:flex;gap:5px;}
+.fm-dots span{width:9px;height:9px;border-radius:50%;}
+.fm-dots span:nth-child(1){background:#ff4d6d;}
+.fm-dots span:nth-child(2){background:var(--a4);}
+.fm-dots span:nth-child(3){background:var(--a1);}
+.fm-url{flex:1;background:rgba(255,255,255,0.04);border-radius:50px;padding:4px 12px;font-size:.7rem;color:var(--muted2);text-align:center;}
+.fm-body{padding:32px;}
+.fm-headline{font-family:'Bricolage Grotesque',sans-serif;font-size:1.5rem;font-weight:800;line-height:1.2;margin-bottom:10px;}
+.fm-sub{font-size:.85rem;color:var(--muted3);margin-bottom:20px;line-height:1.6;}
+.fm-bullets{margin-bottom:20px;}
+.fm-bullet{padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:.82rem;}
+.fm-urgency{font-size:.78rem;color:var(--a4);margin-bottom:16px;}
+.fm-form{display:flex;gap:8px;flex-wrap:wrap;}
+.fm-input{flex:1;min-width:140px;background:rgba(255,255,255,0.05);border:1px solid var(--border2);border-radius:9px;padding:10px 14px;color:var(--text);font-size:.82rem;}
+.fm-btn{background:linear-gradient(135deg,var(--a1),var(--a2));border:none;border-radius:9px;padding:10px 20px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;color:#050709;cursor:pointer;font-size:.85rem;}
+
+.email-cards{display:flex;flex-direction:column;gap:10px;}
+.ec{background:var(--s3);border:1px solid var(--border2);border-radius:14px;padding:16px 20px;display:flex;gap:14px;align-items:flex-start;transition:.2s;}
+.ec:hover{border-color:rgba(57,255,158,0.15);}
+.ec-day{width:42px;height:42px;border-radius:10px;background:rgba(57,255,158,0.08);border:1px solid rgba(57,255,158,0.12);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;}
+.ec-day .n{font-family:'Bricolage Grotesque',sans-serif;font-size:1.1rem;font-weight:800;color:var(--a1);line-height:1;}
+.ec-day .l{font-size:.58rem;color:var(--muted2);}
+.ec-body{flex:1;}
+.ec-subj{font-weight:700;font-size:.88rem;margin-bottom:4px;}
+.ec-prev{font-size:.78rem;color:var(--muted3);line-height:1.5;}
+.ec-badge{background:rgba(57,255,158,0.08);color:var(--a1);border:1px solid rgba(57,255,158,0.15);border-radius:50px;padding:2px 9px;font-size:.68rem;white-space:nowrap;}
+
+.ads-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;}
+.ad-c{background:var(--s3);border:1px solid var(--border2);border-radius:14px;overflow:hidden;transition:.2s;}
+.ad-c:hover{border-color:rgba(199,125,255,0.25);transform:translateY(-2px);}
+.ad-plat{padding:10px 14px;border-bottom:1px solid var(--border2);font-size:.78rem;font-weight:600;display:flex;align-items:center;gap:7px;}
+.ad-body2{padding:16px;}
+.ad-h{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:.9rem;margin-bottom:6px;}
+.ad-copy{font-size:.78rem;color:var(--muted3);line-height:1.5;margin-bottom:12px;}
+.ad-footer{display:flex;justify-content:space-between;align-items:center;}
+.ad-cta2{background:rgba(199,125,255,0.1);color:var(--a5);border:1px solid rgba(199,125,255,0.2);border-radius:50px;padding:3px 10px;font-size:.7rem;}
+.ad-bud{font-size:.7rem;color:var(--muted2);}
+
+.flow-stack{display:flex;flex-direction:column;gap:0;}
+.fn{display:flex;gap:14px;align-items:flex-start;}
+.fn-line{display:flex;flex-direction:column;align-items:center;width:38px;flex-shrink:0;}
+.fn-ico{width:38px;height:38px;border-radius:10px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:.95rem;}
+.fn-conn{width:1px;height:24px;background:var(--border2);margin:3px 0;}
+.fn-content{flex:1;background:var(--s3);border:1px solid var(--border2);border-radius:12px;padding:13px 16px;margin-bottom:10px;}
+.fn-content h4{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:.85rem;margin-bottom:3px;}
+.fn-content p{font-size:.76rem;color:var(--muted3);line-height:1.5;}
+.fn-timing{font-size:.7rem;color:var(--a1);margin-top:5px;}
+
+.agent-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.agent-chat{background:var(--s3);border:1px solid var(--border2);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:9px;max-height:340px;overflow-y:auto;}
+.ac-msg{display:flex;gap:8px;align-items:flex-end;}
+.ac-msg.out{flex-direction:row-reverse;}
+.ac-ava{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;flex-shrink:0;}
+.ac-bub{padding:9px 13px;border-radius:14px;font-size:.78rem;line-height:1.5;}
+.ac-msg.in .ac-bub{background:var(--s4);border:1px solid var(--border2);border-bottom-left-radius:3px;}
+.ac-msg.out .ac-bub{background:rgba(57,255,158,0.1);border:1px solid rgba(57,255,158,0.15);border-bottom-right-radius:3px;}
+.agent-config{display:flex;flex-direction:column;gap:8px;}
+.agent-cfg-item{background:var(--s3);border:1px solid var(--border2);border-radius:10px;padding:12px;}
+.agent-cfg-item .lbl{font-size:.68rem;color:var(--a1);font-weight:700;margin-bottom:4px;}
+.agent-cfg-item .val{font-size:.78rem;color:var(--muted3);line-height:1.5;}
+
+.res-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;}
+.ra-btn{display:flex;align-items:center;gap:7px;padding:11px 20px;border-radius:11px;border:1px solid var(--border2);background:var(--s2);font-size:.82rem;cursor:pointer;color:var(--muted3);transition:.2s;font-family:'Mulish',sans-serif;}
+.ra-btn:hover{color:var(--text);border-color:rgba(255,255,255,.15);}
+.ra-btn.primary{background:linear-gradient(135deg,var(--a1),var(--a2));color:#050709;border:none;font-weight:700;}
+.ra-btn.primary:hover{transform:scale(1.02);box-shadow:0 6px 24px var(--glow);}
+
+/* ════════════════════════════════
+   PAGE 3 — OMNICHANNEL INBOX
+════════════════════════════════ */
+#pg-inbox{overflow:hidden;}
+.inbox-shell{display:flex;flex:1;overflow:hidden;}
+
+.inbox-channels{
+  width:200px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--border2);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.ic-head{padding:14px 14px 10px;border-bottom:1px solid var(--border2);}
+.ic-head h3{font-family:'Bricolage Grotesque',sans-serif;font-size:.8rem;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+.ic-search{background:var(--s3);border:1px solid var(--border2);border-radius:8px;padding:6px 10px;display:flex;gap:6px;align-items:center;}
+.ic-search input{background:transparent;border:none;outline:none;color:var(--text);font-size:.75rem;width:100%;}
+.ic-list{overflow-y:auto;flex:1;padding:8px;}
+.ic-item{display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:9px;cursor:pointer;transition:.15s;margin-bottom:2px;position:relative;}
+.ic-item:hover{background:var(--s3);}
+.ic-item.active{background:rgba(57,255,158,0.06);border:1px solid rgba(57,255,158,0.1);}
+.ic-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;}
+.ic-info{flex:1;min-width:0;}
+.ic-name{font-size:.78rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ic-sub{font-size:.68rem;color:var(--muted2);}
+.ic-count{min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;padding:0 3px;}
+
+.inbox-convs{
+  width:250px;flex-shrink:0;background:var(--s2);border-right:1px solid var(--border2);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.iconvs-head{padding:12px 14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;}
+.iconvs-head h2{font-family:'Bricolage Grotesque',sans-serif;font-size:.88rem;font-weight:700;}
+.iconvs-list{overflow-y:auto;flex:1;}
+.iconv{display:flex;gap:9px;padding:11px 14px;cursor:pointer;transition:.15s;border-bottom:1px solid rgba(255,255,255,.025);position:relative;}
+.iconv:hover{background:var(--s3);}
+.iconv.active{background:rgba(57,255,158,0.04);border-left:2px solid var(--a1);}
+.iconv-ava{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;flex-shrink:0;position:relative;}
+.iconv-ch{position:absolute;bottom:-1px;right:-1px;width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.55rem;border:1px solid var(--s2);}
+.iconv-body{flex:1;min-width:0;}
+.iconv-r1{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;}
+.iconv-name{font-size:.8rem;font-weight:600;}
+.iconv-time{font-size:.65rem;color:var(--muted);}
+.iconv-prev{font-size:.72rem;color:var(--muted2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;}
+.iconv-tags{display:flex;gap:3px;}
+.it{font-size:.62rem;padding:1px 6px;border-radius:50px;}
+.it-ai{background:rgba(57,255,158,0.08);color:var(--a1);border:1px solid rgba(57,255,158,0.12);}
+.it-hot{background:rgba(255,209,102,0.1);color:var(--a4);}
+.it-new{background:rgba(225,48,108,0.1);color:var(--ig);}
+.it-you{background:rgba(0,212,255,0.1);color:var(--a2);}
+.iconv-unread{width:7px;height:7px;border-radius:50%;background:var(--a1);position:absolute;top:13px;right:10px;}
+
+.inbox-chat{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+.inbox-chat-top{
+  padding:12px 18px;border-bottom:1px solid var(--border2);
+  background:var(--s1);display:flex;align-items:center;gap:12px;flex-shrink:0;
+}
+.ict-contact{flex:1;}
+.ict-name{font-family:'Bricolage Grotesque',sans-serif;font-size:.95rem;font-weight:700;display:flex;align-items:center;gap:8px;}
+.ict-sub{font-size:.72rem;color:var(--muted3);margin-top:2px;}
+.ict-actions{display:flex;gap:7px;}
+.ica-btn{background:var(--s3);border:1px solid var(--border2);border-radius:8px;padding:6px 12px;font-size:.75rem;cursor:pointer;color:var(--muted3);transition:.2s;display:flex;align-items:center;gap:5px;}
+.ica-btn:hover{color:var(--text);}
+.ica-btn.takeover{background:rgba(0,212,255,0.08);color:var(--a2);border-color:rgba(0,212,255,0.2);}
+.ai-ind{display:flex;align-items:center;gap:5px;background:rgba(57,255,158,0.07);border:1px solid rgba(57,255,158,0.15);border-radius:50px;padding:4px 11px;font-size:.72rem;color:var(--a1);}
+.ai-ind .dot{width:5px;height:5px;border-radius:50%;background:var(--a1);animation:glow 1.5s infinite;}
+
+.mode-banner{padding:7px 18px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;font-size:.75rem;flex-shrink:0;}
+.mb-ai{background:rgba(57,255,158,0.03);border-bottom-color:rgba(57,255,158,0.08);}
+.mb-human{background:rgba(0,212,255,0.03);border-bottom-color:rgba(0,212,255,0.08);}
+.mb-text{display:flex;align-items:center;gap:6px;color:var(--muted2);}
+.mb-text strong{color:var(--a1);}
+.mb-human .mb-text strong{color:var(--a2);}
+.mb-switch{background:transparent;border:1px solid var(--border2);border-radius:6px;padding:2px 9px;font-size:.7rem;cursor:pointer;color:var(--muted2);transition:.2s;}
+.mb-switch:hover{color:var(--text);}
+
+.msgs-area{flex:1;overflow-y:auto;padding:18px;}
+.msg-d{text-align:center;font-size:.68rem;color:var(--muted);margin:14px 0;display:flex;align-items:center;gap:8px;}
+.msg-d::before,.msg-d::after{content:'';flex:1;height:1px;background:var(--border2);}
+.mw{display:flex;gap:9px;margin-bottom:9px;align-items:flex-end;}
+.mw.out{flex-direction:row-reverse;}
+.m-ava{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;flex-shrink:0;}
+.m-bub{max-width:66%;padding:10px 14px;border-radius:16px;font-size:.83rem;line-height:1.6;}
+.mw.in .m-bub{background:var(--s3);border:1px solid var(--border2);border-bottom-left-radius:3px;}
+.mw.out.ai-out .m-bub{background:rgba(57,255,158,0.08);border:1px solid rgba(57,255,158,0.15);border-bottom-right-radius:3px;}
+.mw.out.human-out .m-bub{background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.18);border-bottom-right-radius:3px;}
+.m-meta{font-size:.65rem;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:4px;}
+.mw.out .m-meta{justify-content:flex-end;}
+.mlbl{border-radius:3px;padding:1px 5px;font-size:.6rem;font-weight:700;}
+.mlbl-ai{background:rgba(57,255,158,0.1);color:var(--a1);}
+.mlbl-h{background:rgba(0,212,255,0.1);color:var(--a2);}
+.sys-msg{background:var(--s3);border:1px solid var(--border2);border-radius:50px;font-size:.7rem;color:var(--muted3);padding:5px 14px;margin:8px auto;max-width:340px;text-align:center;}
+.typin{display:flex;gap:9px;align-items:flex-end;margin-bottom:9px;}
+.typin-bub{background:var(--s3);border:1px solid var(--border2);border-radius:16px;border-bottom-left-radius:3px;padding:10px 14px;display:flex;gap:4px;}
+.typin-bub span{width:6px;height:6px;border-radius:50%;background:var(--a1);animation:tb .8s infinite;}
+.typin-bub span:nth-child(2){animation-delay:.15s;}
+.typin-bub span:nth-child(3){animation-delay:.3s;}
+@keyframes tb{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
+
+.qreplies{padding:8px 18px;background:var(--s1);border-top:1px solid var(--border2);display:flex;gap:7px;flex-wrap:wrap;flex-shrink:0;}
+.qr2{background:var(--s3);border:1px solid var(--border2);border-radius:50px;padding:5px 12px;font-size:.72rem;color:var(--muted3);cursor:pointer;transition:.2s;}
+.qr2:hover{border-color:rgba(57,255,158,0.25);color:var(--a1);}
+
+.draft-bar{padding:8px 18px;background:rgba(57,255,158,0.03);border-top:1px solid rgba(57,255,158,0.07);display:flex;align-items:center;gap:10px;font-size:.75rem;flex-shrink:0;}
+.db-text{flex:1;color:var(--muted2);}
+.db-text strong{color:var(--a1);}
+.db-btn{background:var(--s3);border:1px solid var(--border2);border-radius:6px;padding:4px 10px;font-size:.7rem;cursor:pointer;color:var(--muted2);transition:.2s;}
+.db-btn.use{background:rgba(57,255,158,0.08);color:var(--a1);border-color:rgba(57,255,158,0.15);}
+
+.input-zone{padding:12px 18px;border-top:1px solid var(--border2);background:var(--s1);flex-shrink:0;}
+.iz-toolbar{display:flex;gap:8px;margin-bottom:8px;}
+.iz-tool{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:.85rem;transition:.2s;}
+.iz-tool:hover{color:var(--text);}
+.iz-row{display:flex;gap:9px;align-items:flex-end;}
+.iz-input{flex:1;background:var(--s3);border:1px solid var(--border2);border-radius:12px;padding:10px 14px;color:var(--text);font-family:'Mulish',sans-serif;font-size:.83rem;outline:none;resize:none;max-height:90px;line-height:1.5;transition:.2s;}
+.iz-input:focus{border-color:rgba(57,255,158,0.25);}
+.iz-input::placeholder{color:var(--muted2);}
+.iz-send{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--a1),var(--a2));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;transition:.2s;}
+.iz-send:hover{transform:scale(1.05);box-shadow:0 4px 16px var(--glow);}
+
+.inbox-right{
+  width:250px;flex-shrink:0;background:var(--s1);border-left:1px solid var(--border2);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.ir-head{padding:13px 15px;border-bottom:1px solid var(--border2);font-family:'Bricolage Grotesque',sans-serif;font-size:.82rem;font-weight:700;}
+.ir-body{overflow-y:auto;flex:1;padding:13px;}
+.ir-sect{margin-bottom:18px;}
+.ir-label{font-size:.65rem;color:var(--muted2);text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:9px;}
+.ir-contact{background:var(--s3);border:1px solid var(--border2);border-radius:11px;padding:13px;display:flex;gap:9px;align-items:center;margin-bottom:10px;}
+.ir-info{display:flex;flex-direction:column;gap:0;}
+.ir-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:.75rem;}
+.ir-row:last-child{border-bottom:none;}
+.ir-key{color:var(--muted2);}
+.ir-val{font-weight:500;font-size:.74rem;}
+.pipeline-mini{background:var(--s3);border:1px solid var(--border2);border-radius:10px;padding:11px;}
+.pm-label{font-size:.75rem;font-weight:700;margin-bottom:8px;display:flex;justify-content:space-between;}
+.pm-label span{font-size:.68rem;color:var(--a1);}
+.pm-dots{display:flex;gap:3px;}
+.pm-dot{flex:1;height:4px;border-radius:3px;background:var(--s4);}
+.pm-dot.d{background:var(--a1);}
+.pm-dot.a{background:rgba(57,255,158,0.3);}
+.pm-stage{font-size:.7rem;color:var(--muted3);margin-top:6px;}
+.ai-activity{display:flex;flex-direction:column;gap:5px;}
+.aa-item{background:var(--s3);border-radius:7px;padding:6px 9px;font-size:.72rem;color:var(--muted3);display:flex;justify-content:space-between;}
+.aa-item.pending{background:rgba(57,255,158,0.04);border:1px solid rgba(57,255,158,0.1);color:var(--a1);}
+.ir-actions{display:flex;flex-direction:column;gap:7px;}
+.ir-act{width:100%;background:var(--s3);border:1px solid var(--border2);border-radius:9px;padding:9px;font-size:.77rem;cursor:pointer;color:var(--muted3);transition:.2s;display:flex;align-items:center;gap:7px;}
+.ir-act:hover{color:var(--text);}
+.ir-act.p{background:rgba(57,255,158,0.07);color:var(--a1);border-color:rgba(57,255,158,0.18);}
+
+/* ════════════════════════════════
+   PAGE 4 — LEADS CRM
+════════════════════════════════ */
+#pg-leads{flex-direction:column;overflow-y:auto;padding:24px;}
+.leads-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+.leads-header h2{font-family:'Bricolage Grotesque',sans-serif;font-size:1.2rem;font-weight:800;}
+.leads-filters{display:flex;gap:8px;flex-wrap:wrap;}
+.lf{background:var(--s3);border:1px solid var(--border2);border-radius:50px;padding:6px 14px;font-size:.75rem;cursor:pointer;color:var(--muted3);transition:.2s;}
+.lf.active{background:rgba(57,255,158,0.1);color:var(--a1);border-color:rgba(57,255,158,0.2);}
+.leads-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;}
+.lkpi{background:var(--s2);border:1px solid var(--border2);border-radius:14px;padding:16px;}
+.lkpi-val{font-family:'Bricolage Grotesque',sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:2px;}
+.lkpi-lbl{font-size:.72rem;color:var(--muted3);}
+.leads-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+.lead-card{
+  background:var(--s2);border:1px solid var(--border2);border-radius:16px;
+  padding:18px;transition:.2s;cursor:pointer;
+}
+.lead-card:hover{border-color:rgba(57,255,158,0.15);transform:translateY(-2px);}
+.lc-top{display:flex;gap:11px;align-items:center;margin-bottom:14px;}
+.lc-ava{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;flex-shrink:0;}
+.lc-name{font-weight:700;font-size:.9rem;margin-bottom:2px;}
+.lc-biz{font-size:.75rem;color:var(--muted3);}
+.lc-rows{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.lcr{display:flex;align-items:center;gap:7px;font-size:.75rem;color:var(--muted3);}
+.lc-bottom{display:flex;justify-content:space-between;align-items:center;}
+.lc-score{font-size:.75rem;font-weight:700;}
+.lc-actions{display:flex;gap:5px;}
+.lca{background:var(--s4);border:1px solid var(--border2);border-radius:6px;padding:4px 9px;font-size:.7rem;cursor:pointer;transition:.2s;color:var(--muted3);}
+.lca:hover{color:var(--text);}
+.lca.p{background:rgba(57,255,158,0.08);color:var(--a1);border-color:rgba(57,255,158,0.15);}
+
+/* ════════════════════════════════
+   PAGE 5 — ANALYTICS
+════════════════════════════════ */
+#pg-analytics{flex-direction:column;overflow-y:auto;padding:24px;}
+.analytics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;}
+.an-card{background:var(--s2);border:1px solid var(--border2);border-radius:16px;padding:20px;}
+.an-card h3{font-family:'Bricolage Grotesque',sans-serif;font-size:.85rem;font-weight:700;margin-bottom:16px;color:var(--muted3);}
+.bar-chart{display:flex;flex-direction:column;gap:8px;}
+.bc-row{display:flex;align-items:center;gap:10px;}
+.bc-lbl{width:80px;font-size:.72rem;color:var(--muted3);flex-shrink:0;}
+.bc-track{flex:1;height:8px;background:var(--s4);border-radius:8px;overflow:hidden;}
+.bc-fill{height:100%;border-radius:8px;}
+.bc-val{font-size:.72rem;font-weight:700;width:28px;text-align:right;}
+.funnel-chart{display:flex;flex-direction:column;gap:4px;}
+.fc-step{border-radius:8px;padding:8px 12px;font-size:.75rem;display:flex;justify-content:space-between;align-items:center;}
+.fc-step:nth-child(1){background:rgba(57,255,158,0.12);width:100%;}
+.fc-step:nth-child(2){background:rgba(0,212,255,0.1);width:80%;}
+.fc-step:nth-child(3){background:rgba(199,125,255,0.1);width:60%;}
+.fc-step:nth-child(4){background:rgba(255,209,102,0.1);width:35%;}
+.fc-step:nth-child(5){background:rgba(255,107,107,0.1);width:18%;}
+.revenue-chart{display:flex;align-items:flex-end;gap:6px;height:80px;padding:0 4px;}
+.rv-bar{flex:1;border-radius:4px 4px 0 0;position:relative;cursor:pointer;transition:.2s;}
+.rv-bar:hover{opacity:.8;}
+.rv-lbl{font-size:.6rem;color:var(--muted);text-align:center;margin-top:4px;}
+
+/* TOAST */
+#toast{
+  position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(55px);
+  background:var(--s3);border:1px solid var(--border2);border-radius:10px;
+  padding:9px 18px;font-size:.8rem;z-index:9999;transition:.25s;
+  box-shadow:0 12px 40px rgba(0,0,0,.5);display:flex;align-items:center;gap:8px;
+  white-space:nowrap;
+}
+#toast.show{transform:translateX(-50%) translateY(0);}
+
+@media(max-width:1100px){.inbox-right,.ir-head{display:none;}}
+@media(max-width:850px){.inbox-convs{display:none;}.analytics-grid{grid-template-columns:1fr 1fr;}.leads-kpis{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:650px){.inbox-channels{display:none;}.kpi-row{grid-template-columns:repeat(2,1fr);}.ov-grid{grid-template-columns:1fr;}.analytics-grid{grid-template-columns:1fr;}.leads-kpis{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ─── RAIL ─── -->
+<div class="rail">
+  <div class="rail-logo">N</div>
+  <div class="rail-btn active" id="rb-overview" title="Overview" onclick="nav('overview')">🏠</div>
+  <div class="rail-btn" id="rb-launch" title="AI Launcher" onclick="nav('launch')">⚡</div>
+  <div class="rail-btn" id="rb-inbox" title="Omnichannel Inbox" onclick="nav('inbox')">💬<span class="rb-badge">12</span></div>
+  <div class="rail-btn" id="rb-leads" title="Leads CRM" onclick="nav('leads')">👥</div>
+  <div class="rail-btn" id="rb-analytics" title="Analytics" onclick="nav('analytics')">📊</div>
+  <div class="rail-spacer"></div>
+  <div class="rail-btn" title="Settings" onclick="showToast('⚙️ Settings panel — coming soon!')">⚙️</div>
+  <div class="rail-avatar" onclick="showToast('👤 Tamzid — Agency Plan')">T</div>
+</div>
+
+<div class="main">
+<!-- ─── TOPBAR ─── -->
+<div class="topbar">
+  <div class="tb-title" id="tb-title">🏠 <span>Overview</span> — NovaMind Business OS</div>
+  <div class="tb-pills">
+    <div class="tb-pill"><span class="dot green-dot"></span> 5 channels live</div>
+    <div class="tb-pill" onclick="showToast('🤖 AI Mode: Full Auto — handling all channels')">🤖 AI: Full Auto</div>
+    <div class="tb-pill" onclick="showToast('💳 Agency Plan — 25 clients active')">💳 Agency Plan</div>
+    <div class="tb-pill" onclick="showToast('🔔 3 new hot leads!')">🔔 3 alerts</div>
+  </div>
+</div>
+
+<!-- ════ PAGE: OVERVIEW ════ -->
+<div class="page active" id="pg-overview">
+  <div class="ov-welcome">
+    <div class="ov-welcome-text">
+      <h2>Good morning, Tamzid 👋</h2>
+      <p>Your AI is running 24/7 across 5 channels. <strong style="color:var(--a1);">12 new conversations</strong> today — 3 hot leads ready to close.</p>
+    </div>
+    <div class="ov-url-mini">
+      <span style="color:var(--muted2);font-size:.85rem;">🌐</span>
+      <input id="ov-url" placeholder="Add new client — paste URL or describe business..." />
+      <button onclick="quickLaunch()">⚡ Launch</button>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi" onclick="nav('leads')">
+      <div class="kpi-top"><div class="kpi-icon" style="background:rgba(57,255,158,0.1);">👥</div><span class="kpi-change up">↑ 31%</span></div>
+      <div class="kpi-val" style="color:var(--a1);">247</div><div class="kpi-lbl">Total Leads This Month</div>
+    </div>
+    <div class="kpi" onclick="nav('inbox')">
+      <div class="kpi-top"><div class="kpi-icon" style="background:rgba(0,212,255,0.1);">💬</div><span class="kpi-change up">↑ 18%</span></div>
+      <div class="kpi-val" style="color:var(--a2);">12</div><div class="kpi-lbl">Open Conversations</div>
+    </div>
+    <div class="kpi" onclick="nav('analytics')">
+      <div class="kpi-top"><div class="kpi-icon" style="background:rgba(255,209,102,0.1);">💰</div><span class="kpi-change up">↑ 44%</span></div>
+      <div class="kpi-val" style="color:var(--a4);">$18,400</div><div class="kpi-lbl">Revenue This Month</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-top"><div class="kpi-icon" style="background:rgba(199,125,255,0.1);">🏢</div><span class="kpi-change up">+3</span></div>
+      <div class="kpi-val" style="color:var(--a5);">25</div><div class="kpi-lbl">Active Clients</div>
+    </div>
+  </div>
+
+  <div class="ov-grid">
+    <div class="ov-card">
+      <div class="ov-card-title">📊 Leads by Channel <a onclick="nav('analytics')">View all →</a></div>
+      <div class="ch-bars">
+        <div class="ch-bar-row"><span class="ch-bar-label" style="color:var(--wa);">💬 WhatsApp</span><div class="ch-bar-track"><div class="ch-bar-fill" style="width:72%;background:var(--wa);"></div></div><span class="ch-bar-val" style="color:var(--wa);">89</span></div>
+        <div class="ch-bar-row"><span class="ch-bar-label" style="color:var(--ig);">📸 Instagram</span><div class="ch-bar-track"><div class="ch-bar-fill" style="width:58%;background:var(--ig);"></div></div><span class="ch-bar-val" style="color:var(--ig);">72</span></div>
+        <div class="ch-bar-row"><span class="ch-bar-label" style="color:var(--fb);">📘 Messenger</span><div class="ch-bar-track"><div class="ch-bar-fill" style="width:40%;background:var(--fb);"></div></div><span class="ch-bar-val" style="color:var(--fb);">49</span></div>
+        <div class="ch-bar-row"><span class="ch-bar-label" style="color:var(--web);">🌐 Web Chat</span><div class="ch-bar-track"><div class="ch-bar-fill" style="width:28%;background:var(--web);"></div></div><span class="ch-bar-val" style="color:var(--web);">35</span></div>
+        <div class="ch-bar-row"><span class="ch-bar-label" style="color:var(--sms);">📱 SMS</span><div class="ch-bar-track"><div class="ch-bar-fill" style="width:16%;background:var(--sms);"></div></div><span class="ch-bar-val" style="color:var(--sms);">20</span></div>
+      </div>
+    </div>
+    <div class="ov-card">
+      <div class="ov-card-title">⚡ Live Activity <a onclick="nav('inbox')">Open inbox →</a></div>
+      <div class="activity-list">
+        <div class="act-item"><div class="act-icon" style="background:rgba(37,211,102,0.1);">💬</div><div class="act-text"><strong>Sarah Mitchell</strong> replied on WhatsApp — wants to book a call 🔥</div><div class="act-time">2m</div></div>
+        <div class="act-item"><div class="act-icon" style="background:rgba(225,48,108,0.1);">📸</div><div class="act-text"><strong>James K.</strong> sent DM from Instagram ad — AI is qualifying now</div><div class="act-time">8m</div></div>
+        <div class="act-item"><div class="act-icon" style="background:rgba(57,255,158,0.1);">✅</div><div class="act-text"><strong>Priya Nair</strong> booked a consultation via Calendly link</div><div class="act-time">22m</div></div>
+        <div class="act-item"><div class="act-icon" style="background:rgba(255,209,102,0.1);">📧</div><div class="act-text">Email sequence sent to <strong>14 leads</strong> — Day 3 follow-up</div><div class="act-time">1h</div></div>
+        <div class="act-item"><div class="act-icon" style="background:rgba(199,125,255,0.1);">🏗️</div><div class="act-text"><strong>IronForge Gym</strong> funnel deployed — 3 leads in first hour</div><div class="act-time">2h</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ov-card" style="margin-bottom:0;">
+    <div class="ov-card-title">🏢 Client Accounts <a onclick="showToast('➕ Add client modal')">+ Add client</a></div>
+    <table class="clients-table" style="width:100%">
+      <thead><tr><th>Business</th><th>Channels</th><th>Leads/mo</th><th>Revenue</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Serenity Yoga</strong><br><span style="font-size:.72rem;color:var(--muted3);"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c0b3a1b2a1a880b3a5b2a5aea9b4b9edb9afa7a1eea3afad">[email&#160;protected]</a></span></td><td>💬📸🌐</td><td style="color:var(--a1);">48</td><td style="color:var(--a4);">$297/mo</td><td><span class="status-badge s-active">● Active</span></td><td><button class="lca p" onclick="nav('inbox')">Open</button></td></tr>
+        <tr><td><strong>IronForge Gym</strong><br><span style="font-size:.72rem;color:var(--muted3);"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="16716f7b567f64797870796471733875797b">[email&#160;protected]</a></span></td><td>💬📘📱</td><td style="color:var(--a1);">63</td><td style="color:var(--a4);">$197/mo</td><td><span class="status-badge s-active">● Active</span></td><td><button class="lca p" onclick="nav('inbox')">Open</button></td></tr>
+        <tr><td><strong>SmileCare Dental</strong><br><span style="font-size:.72rem;color:var(--muted3);"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7d14131b123d0e101411181e1c0f18531e1210">[email&#160;protected]</a></span></td><td>💬🌐</td><td style="color:var(--a4);">22</td><td style="color:var(--a4);">$97/mo</td><td><span class="status-badge s-setup">◐ Setting up</span></td><td><button class="lca" onclick="nav('launch')">Configure</button></td></tr>
+        <tr><td><strong>Casa Bella</strong><br><span style="font-size:.72rem;color:var(--muted3);"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="96fef3fafaf9d6f5f7e5f7f4f3fafaf7b8f5f9fb">[email&#160;protected]</a></span></td><td>📸📘</td><td style="color:var(--muted3);">—</td><td style="color:var(--muted3);">$97/mo</td><td><span class="status-badge s-paused">○ Paused</span></td><td><button class="lca" onclick="showToast('▶️ Reactivating...')">Resume</button></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════ PAGE: AI LAUNCHER ════ -->
+<div class="page" id="pg-launch">
+  <div class="launch-hero">
+    <div class="launch-badge"><span class="dot green-dot"></span> Claude AI Engine — Ready</div>
+    <h1>Describe the business.<br><em>Get a full sales machine.</em></h1>
+    <p>Fill in the business details below. The more you tell us, the more personalised and accurate your AI system will be. Try a demo chip first!</p>
+    <div style="max-width:680px;margin:0 auto 20px;background:var(--s2);border:1px solid var(--border);border-radius:20px;overflow:hidden;">
+      <div style="display:flex;border-bottom:1px solid var(--border2);">
+        <div id="step-tab-1" onclick="switchStep(1)" style="flex:1;padding:12px;text-align:center;font-size:.78rem;font-weight:700;color:var(--a1);background:rgba(57,255,158,0.06);border-bottom:2px solid var(--a1);cursor:pointer;">① Business Info</div>
+        <div id="step-tab-2" onclick="switchStep(2)" style="flex:1;padding:12px;text-align:center;font-size:.78rem;font-weight:600;color:var(--muted2);cursor:pointer;">② Extra Details <span style="font-size:.65rem;opacity:.6;">(optional)</span></div>
+      </div>
+      <div id="step-1" style="padding:20px;display:flex;flex-direction:column;gap:14px;">
+        <div>
+          <label style="font-size:.72rem;color:var(--a1);font-weight:700;display:block;margin-bottom:6px;">🌐 Website URL <span style="color:var(--muted2);font-weight:400;">(optional — for context)</span></label>
+          <div style="display:flex;align-items:center;gap:8px;background:var(--s3);border:1px solid var(--border2);border-radius:10px;padding:8px 14px;">
+            <span style="color:var(--muted2);">🔗</span>
+            <input id="launch-url" style="flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:.85rem;font-family:'Mulish',sans-serif;" placeholder="https://yourbusiness.com" />
+          </div>
+          <div style="font-size:.68rem;color:var(--muted2);margin-top:4px;">⚠️ AI cannot visit URLs directly — use the description below for accurate results.</div>
+        </div>
+        <div>
+          <label style="font-size:.72rem;color:var(--a1);font-weight:700;display:block;margin-bottom:6px;">🏢 Business Description <span style="color:var(--a3);">* required</span></label>
+          <textarea id="launch-desc" rows="4" oninput="this.style.borderColor='rgba(57,255,158,0.3)'" style="width:100%;background:var(--s3);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;color:var(--text);font-family:'Mulish',sans-serif;font-size:.84rem;outline:none;resize:none;line-height:1.6;" placeholder="Example: Sarah's Yoga Studio in Austin TX. We offer yoga classes for all levels, 1-on-1 sessions, and meditation. Classes cost $25 each or $150/month. Our target customers are women aged 25-45 who want to reduce stress and improve fitness. We currently get clients through Instagram but want more leads."></textarea>
+          <div style="font-size:.68rem;color:var(--muted2);margin-top:4px;">💡 Include: what you sell, your prices, location, and who your ideal customer is.</div>
+        </div>
+        <div>
+          <label style="font-size:.72rem;color:var(--a1);font-weight:700;display:block;margin-bottom:8px;">🎯 Business Type</label>
+          <div style="display:flex;gap:7px;flex-wrap:wrap;">
+            <div class="btype active" onclick="selectType(this,'Beauty & Salon')">💇 Salon</div>
+            <div class="btype" onclick="selectType(this,'Gym & Fitness')">💪 Gym</div>
+            <div class="btype" onclick="selectType(this,'Restaurant & Food')">🍕 Restaurant</div>
+            <div class="btype" onclick="selectType(this,'Health & Dental')">🦷 Dental</div>
+            <div class="btype" onclick="selectType(this,'Yoga & Wellness')">🧘 Yoga</div>
+            <div class="btype" onclick="selectType(this,'Real Estate')">🏠 Realtor</div>
+            <div class="btype" onclick="selectType(this,'Coaching')">🎓 Coaching</div>
+            <div class="btype" onclick="selectType(this,'Other')">🏢 Other</div>
+          </div>
+        </div>
+      </div>
+      <div id="step-2" style="padding:20px;display:none;flex-direction:column;gap:14px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div><label style="font-size:.72rem;color:var(--a1);font-weight:700;display:block;margin-bottom:6px;">📍 Location</label><input id="launch-city" style="width:100%;background:var(--s3);border:1px solid var(--border2);border-radius:10px;padding:10px 14px;color:var(--text);font-family:'Mulish',sans-serif;font-size:.84rem;outline:none;" placeholder="e.g. Austin, TX" /></div>
+          <div><label style="font-size:.72rem;color:var(--a1);font-weight:700;display:block;margin-bottom:6px;">💰 Price Range</label><input id="launch-price" style="width:100%;background:var(--s3);border:1px solid var(--border2);border-radius:10px;padding:10px 14px;color:var(--text);font-family:'Mulish',sans-serif;font-size:.84rem;outline:none;" placeholder="e.g. $25-$150/session" /></div>
+        </div>
+        <div><label style="font-size:.72rem;color:var(--a1);font-weight:700;display:block;margin-bottom:6px;">🎯 Target Customer</label><input id="launch-target" style="width:100%;background:var(--s3);border:1px solid var(--border2);border-radius:10px;padding:10px 14px;color:var(--text);font-family:'Mulish',sans-serif;font-size:.84rem;outline:none;" placeholder="e.g. Women 25-45 wanting to lose weight" /></div>
+        <div><label style="font-size:.72rem;color:var(--a1);font-weight:700;display:block;margin-bottom:6px;">⭐ Unique Selling Point</label><input id="launch-usp" style="width:100%;background:var(--s3);border:1px solid var(--border2);border-radius:10px;padding:10px 14px;color:var(--text);font-family:'Mulish',sans-serif;font-size:.84rem;outline:none;" placeholder="e.g. Only studio with hot yoga + meditation" /></div>
+        <div><label style="font-size:.72rem;color:var(--a1);font-weight:700;display:block;margin-bottom:6px;">📣 Current Marketing</label><input id="launch-channels" style="width:100%;background:var(--s3);border:1px solid var(--border2);border-radius:10px;padding:10px 14px;color:var(--text);font-family:'Mulish',sans-serif;font-size:.84rem;outline:none;" placeholder="e.g. Instagram, word of mouth only" /></div>
+      </div>
+      <div style="padding:0 20px 20px;display:flex;gap:10px;">
+        <button id="launch-btn" onclick="runLaunch()" style="flex:1;background:linear-gradient(135deg,var(--a1),var(--a2));border:none;border-radius:12px;padding:14px;font-family:'Bricolage Grotesque',sans-serif;font-size:.95rem;font-weight:800;color:#050709;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s;"><span id="lbtn-txt">⚡ Build My Sales System</span></button>
+        <button id="step-toggle-btn" onclick="switchStep(step===1?2:1)" style="background:var(--s3);border:1px solid var(--border2);border-radius:12px;padding:14px 18px;font-size:.8rem;color:var(--muted3);cursor:pointer;white-space:nowrap;">+ Details</button>
+      </div>
+    </div>
+    <div style="text-align:center;margin-bottom:8px;font-size:.72rem;color:var(--muted2);">⚡ Try a demo — auto-filled with real business info:</div>
+    <div class="demo-chips">
+      <div class="demo-chip" onclick="fillLaunch('yoga')">🧘 Yoga Studio</div>
+      <div class="demo-chip" onclick="fillLaunch('dental')">🦷 Dental Clinic</div>
+      <div class="demo-chip" onclick="fillLaunch('gym')">💪 Gym & Fitness</div>
+      <div class="demo-chip" onclick="fillLaunch('restaurant')">🍕 Restaurant</div>
+      <div class="demo-chip" onclick="fillLaunch('realtor')">🏠 Real Estate</div>
+      <div class="demo-chip" onclick="fillLaunch('salon')">💇 Hair Salon</div>
+    </div>
+  </div>
+
+  <div id="launch-progress">
+    <div class="lp-card">
+      <div class="lp-head"><div class="lp-title" id="lp-title">🔍 Reading website...</div><div class="lp-pct" id="lp-pct">0%</div></div>
+      <div class="lp-track"><div class="lp-fill" id="lp-fill"></div></div>
+      <div class="lp-steps">
+        <div class="lp-step"><div class="lp-dot" id="lpd1">🔍</div><div class="lp-step-lbl">Scan</div></div>
+        <div class="lp-step"><div class="lp-dot" id="lpd2">🧠</div><div class="lp-step-lbl">Analyze</div></div>
+        <div class="lp-step"><div class="lp-dot" id="lpd3">🏗️</div><div class="lp-step-lbl">Funnel</div></div>
+        <div class="lp-step"><div class="lp-dot" id="lpd4">📧</div><div class="lp-step-lbl">Emails</div></div>
+        <div class="lp-step"><div class="lp-dot" id="lpd5">📣</div><div class="lp-step-lbl">Ads</div></div>
+        <div class="lp-step"><div class="lp-dot" id="lpd6">🤖</div><div class="lp-step-lbl">Agent</div></div>
+        <div class="lp-step"><div class="lp-dot" id="lpd7">✅</div><div class="lp-step-lbl">Done</div></div>
+      </div>
+      <div class="lp-log" id="lp-log"></div>
+    </div>
+  </div>
+
+  <div id="launch-results">
+    <div class="res-biz" id="res-biz"></div>
+    <div class="res-tabs">
+      <button class="rtab active" onclick="switchRTab('funnel',this)">🏗️ Funnel</button>
+      <button class="rtab" onclick="switchRTab('emails',this)">📧 Emails</button>
+      <button class="rtab" onclick="switchRTab('ads',this)">📣 Ads</button>
+      <button class="rtab" onclick="switchRTab('followup',this)">🔄 Follow-Up</button>
+      <button class="rtab" onclick="switchRTab('agent',this)">🤖 AI Agent</button>
+    </div>
+    <div id="rt-funnel" class="rtab-panel active"></div>
+    <div id="rt-emails" class="rtab-panel"></div>
+    <div id="rt-ads" class="rtab-panel"></div>
+    <div id="rt-followup" class="rtab-panel"></div>
+    <div id="rt-agent" class="rtab-panel"></div>
+    <div class="res-actions">
+      <button class="ra-btn primary" onclick="showToast('🚀 Deploying all systems...')">🚀 Deploy Everything</button>
+      <button class="ra-btn" onclick="showToast('📋 Exported to GHL!')">📋 Send to GHL</button>
+      <button class="ra-btn" onclick="nav('inbox')">💬 Open Inbox</button>
+      <button class="ra-btn" onclick="resetLaunch()">🔄 New Business</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ PAGE: INBOX ════ -->
+<div class="page" id="pg-inbox">
+  <div class="inbox-shell">
+    <div class="inbox-channels">
+      <div class="ic-head">
+        <h3>Channels</h3>
+        <div class="ic-search"><span style="color:var(--muted);font-size:.75rem;">🔍</span><input placeholder="Search..."></div>
+      </div>
+      <div class="ic-list">
+        <div style="font-size:.65rem;color:var(--muted);padding:8px 9px 3px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;">All</div>
+        <div class="ic-item active" onclick="filterInbox('all',this)"><div class="ic-icon" style="background:rgba(57,255,158,0.1);">📥</div><div class="ic-info"><div class="ic-name">All Messages</div><div class="ic-sub">Every channel</div></div><span class="ic-count" style="background:var(--a1);color:#050709;">12</span></div>
+        <div style="font-size:.65rem;color:var(--muted);padding:10px 9px 3px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;">Connected</div>
+        <div class="ic-item" onclick="filterInbox('whatsapp',this)"><div class="ic-icon" style="background:rgba(37,211,102,0.1);">💬</div><div class="ic-info"><div class="ic-name" style="color:var(--wa);">WhatsApp</div><div class="ic-sub">API live</div></div><span class="ic-count" style="background:var(--wa);">4</span></div>
+        <div class="ic-item" onclick="filterInbox('instagram',this)"><div class="ic-icon" style="background:rgba(225,48,108,0.1);">📸</div><div class="ic-info"><div class="ic-name" style="color:var(--ig);">Instagram</div><div class="ic-sub">DMs on</div></div><span class="ic-count" style="background:var(--ig);">3</span></div>
+        <div class="ic-item" onclick="filterInbox('facebook',this)"><div class="ic-icon" style="background:rgba(24,119,242,0.1);">📘</div><div class="ic-info"><div class="ic-name" style="color:var(--fb);">Messenger</div><div class="ic-sub">Page linked</div></div><span class="ic-count" style="background:var(--fb);">2</span></div>
+        <div class="ic-item" onclick="filterInbox('web',this)"><div class="ic-icon" style="background:rgba(245,158,11,0.1);">🌐</div><div class="ic-info"><div class="ic-name" style="color:var(--web);">Web Chat</div><div class="ic-sub">Widget active</div></div><span class="ic-count" style="background:var(--web);">2</span></div>
+        <div class="ic-item" onclick="filterInbox('sms',this)"><div class="ic-icon" style="background:rgba(167,139,250,0.1);">📱</div><div class="ic-info"><div class="ic-name" style="color:var(--sms);">SMS</div><div class="ic-sub">Twilio</div></div><span class="ic-count" style="background:var(--sms);">1</span></div>
+        <div style="font-size:.65rem;color:var(--muted);padding:10px 9px 3px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;">Labels</div>
+        <div class="ic-item" onclick="showToast('🔥 Hot leads')"><div class="ic-icon" style="background:rgba(255,209,102,0.1);">🔥</div><div class="ic-info"><div class="ic-name">Hot Leads</div><div class="ic-sub">High intent</div></div><span class="ic-count" style="background:#d97706;">5</span></div>
+        <div class="ic-item" onclick="showToast('📅 Booking requests')"><div class="ic-icon" style="background:rgba(57,255,158,0.1);">📅</div><div class="ic-info"><div class="ic-name">Booking</div><div class="ic-sub">Ready to close</div></div><span class="ic-count" style="background:#059669;">3</span></div>
+      </div>
+    </div>
+
+    <div class="inbox-convs">
+      <div class="iconvs-head"><h2>Conversations</h2><button class="lca" onclick="showToast('✅ All read')">All read</button></div>
+      <div class="iconv-list" id="iconv-list"></div>
+    </div>
+
+    <div class="inbox-chat">
+      <div class="inbox-chat-top">
+        <div class="iconv-ava" style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#4ade80,#22d3ee);display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;flex-shrink:0;">SM</div>
+        <div class="ict-contact">
+          <div class="ict-name">Sarah Mitchell <span class="it it-hot">🔥 Hot</span> <span style="font-size:.7rem;background:rgba(37,211,102,0.1);color:var(--wa);border:1px solid rgba(37,211,102,0.18);border-radius:50px;padding:1px 8px;">💬 WhatsApp</span></div>
+          <div class="ict-sub">+1 (555) 014-2938 · Lead score: <span style="color:var(--a1);">92/100</span> · Last seen 2 min ago</div>
+        </div>
+        <div class="ict-actions">
+          <button class="ica-btn" onclick="showToast('📅 Booking link sent!')">📅</button>
+          <button class="ica-btn" onclick="showToast('📋 Saved to CRM!')">📋</button>
+          <button class="ica-btn takeover" id="i-takeover" onclick="inboxToggleTakeover()">👤 Take Over</button>
+          <div class="ai-ind" id="i-ai-ind"><span class="dot"></span> AI</div>
+        </div>
+      </div>
+
+      <div class="mode-banner mb-ai" id="i-mode-banner">
+        <div class="mb-text">🤖 <strong>AI is handling this</strong> — qualifying Sarah and going for the booking.</div>
+        <button class="mb-switch" onclick="inboxToggleTakeover()">Take over →</button>
+      </div>
+
+      <div class="msgs-area" id="i-msgs">
+        <div class="msg-d">Today, April 7</div>
+        <div class="mw in"><div class="m-ava" style="background:linear-gradient(135deg,#4ade80,#22d3ee);">SM</div><div><div class="m-bub">Hi! Saw your Instagram ad about the free consultation — is this still available? 👀</div><div class="m-meta">10:14 AM · WhatsApp</div></div></div>
+        <div class="mw out ai-out"><div><div class="m-bub">Hi Sarah! 👋 Yes absolutely — still available! I'm Nova, the AI assistant here. Quick question: are you looking to grow your business or get more clients specifically?</div><div class="m-meta"><span class="mlbl mlbl-ai">🤖 AI</span> 10:14 AM · Instant</div></div><div class="m-ava" style="background:linear-gradient(135deg,var(--a1),var(--a2));">AI</div></div>
+        <div class="mw in"><div class="m-ava" style="background:linear-gradient(135deg,#4ade80,#22d3ee);">SM</div><div><div class="m-bub">More clients! I run a small yoga studio and it's been slow lately 😔</div><div class="m-meta">10:16 AM</div></div></div>
+        <div class="mw out ai-out"><div><div class="m-bub">That's exactly what we help with! 🧘 We've helped 3 yoga studios go from 15 to 60+ students using our AI lead system.<br><br>What's your current main way of getting new students?</div><div class="m-meta"><span class="mlbl mlbl-ai">🤖 AI</span> 10:16 AM</div></div><div class="m-ava" style="background:linear-gradient(135deg,var(--a1),var(--a2));">AI</div></div>
+        <div class="mw in"><div class="m-ava" style="background:linear-gradient(135deg,#4ade80,#22d3ee);">SM</div><div><div class="m-bub">Instagram mostly but barely getting any inquiries from it 😅</div><div class="m-meta">10:19 AM</div></div></div>
+        <div class="mw out ai-out"><div><div class="m-bub">Classic leaky bucket problem! 🪣 We fix this with an AI chatbot on your Instagram that turns followers into leads 24/7.<br><br>Can I get your email to send a free audit of your Instagram setup?</div><div class="m-meta"><span class="mlbl mlbl-ai">🤖 AI</span> 10:20 AM</div></div><div class="m-ava" style="background:linear-gradient(135deg,var(--a1),var(--a2));">AI</div></div>
+        <div class="mw in"><div class="m-ava" style="background:linear-gradient(135deg,#4ade80,#22d3ee);">SM</div><div><div class="m-bub">Sure! <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f7849685969fb784928592999e838eda8e989096d994989a">[email&#160;protected]</a> 🙏</div><div class="m-meta">10:22 AM</div></div></div>
+        <div class="sys-msg">✅ Lead captured · Email sequence started · CRM updated · Owner notified</div>
+        <div class="mw out ai-out"><div><div class="m-bub">Perfect! 🎉 Audit is on its way. Would you prefer a quick 15-min call to go over it, or read it first?</div><div class="m-meta"><span class="mlbl mlbl-ai">🤖 AI</span> 10:22 AM</div></div><div class="m-ava" style="background:linear-gradient(135deg,var(--a1),var(--a2));">AI</div></div>
+        <div class="mw in"><div class="m-ava" style="background:linear-gradient(135deg,#4ade80,#22d3ee);">SM</div><div><div class="m-bub">A call sounds great! What days work? 😊</div><div class="m-meta">10:24 AM · just now</div></div></div>
+        <div class="typin" id="i-typing"><div class="m-ava" style="width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--a1),var(--a2));display:flex;align-items:center;justify-content:center;font-size:.6rem;">AI</div><div class="typin-bub"><span></span><span></span><span></span></div></div>
+      </div>
+
+      <div class="qreplies">
+        <span style="font-size:.7rem;color:var(--muted);">Quick:</span>
+        <div class="qr2" onclick="inboxInsert('📅 Here is my booking link: calendly.com/novamind/call')">📅 Booking link</div>
+        <div class="qr2" onclick="inboxInsert('💰 Starter $97/mo · Growth $197/mo · Agency $497/mo')">💰 Pricing</div>
+        <div class="qr2" onclick="inboxInsert('🎁 Your free audit: [link]. No strings attached!')">🎁 Free gift</div>
+        <div class="qr2" onclick="inboxInsert('✅ Got it! Our team will follow up within the hour.')">✅ Follow up</div>
+      </div>
+
+      <div class="draft-bar" id="i-draft">
+        <span style="font-size:.85rem;">🤖</span>
+        <div class="db-text"><strong>AI Draft:</strong> "Amazing! Just sent you a booking link — pick any slot: calendly.com/novamind/free-call 📅"</div>
+        <button class="db-btn use" onclick="useDraft()">✓ Use</button>
+        <button class="db-btn" onclick="regenInboxDraft()">↺</button>
+        <button class="db-btn" onclick="document.getElementById('i-draft').style.display='none'">✕</button>
+      </div>
+
+      <div class="input-zone">
+        <div class="iz-toolbar">
+          <button class="iz-tool" onclick="showToast('📎 Attach file')">📎</button>
+          <button class="iz-tool" onclick="showToast('😊 Emoji')">😊</button>
+          <button class="iz-tool" onclick="showToast('🖼️ Image')">🖼️</button>
+          <button class="iz-tool" onclick="showToast('📅 Insert Calendly link')">📅</button>
+          <button class="iz-tool" onclick="showToast('🤖 AI suggested reply copied to input')">🤖 AI Suggest</button>
+        </div>
+        <div class="iz-row">
+          <textarea class="iz-input" id="i-input" placeholder="Type a reply... or let AI handle it 🤖" rows="1"
+            oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,90)+'px'"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();inboxSend();}"></textarea>
+          <button class="iz-send" onclick="inboxSend()">➤</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="inbox-right">
+      <div class="ir-head">Lead Profile</div>
+      <div class="ir-body">
+        <div class="ir-sect">
+          <div class="ir-contact">
+            <div class="iconv-ava" style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#4ade80,#22d3ee);display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;">SM</div>
+            <div><div style="font-weight:700;font-size:.85rem;">Sarah Mitchell</div><div style="font-size:.7rem;color:var(--muted3);">💬 WhatsApp · 🔥 Hot</div></div>
+          </div>
+          <div class="ir-info">
+            <div class="ir-row"><span class="ir-key">Email</span><span class="ir-val" style="font-size:.7rem;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0d7e6c7f6c654d7e687f68636479742074626a6c236e6260">[email&#160;protected]</a></span></div>
+            <div class="ir-row"><span class="ir-key">Phone</span><span class="ir-val">+1 555 014 2938</span></div>
+            <div class="ir-row"><span class="ir-key">Business</span><span class="ir-val">Yoga Studio</span></div>
+            <div class="ir-row"><span class="ir-key">Source</span><span class="ir-val">Instagram Ad</span></div>
+            <div class="ir-row"><span class="ir-key">Score</span><span class="ir-val" style="color:var(--a1);">92/100 🔥</span></div>
+          </div>
+        </div>
+        <div class="ir-sect">
+          <div class="ir-label">Pipeline</div>
+          <div class="pipeline-mini">
+            <div class="pm-label">📅 Booking Stage <span>4/5</span></div>
+            <div class="pm-dots"><div class="pm-dot d"></div><div class="pm-dot d"></div><div class="pm-dot d"></div><div class="pm-dot a"></div><div class="pm-dot"></div></div>
+            <div class="pm-stage">New → Contacted → Qualified → <strong style="color:var(--a1);">Booking</strong> → Closed</div>
+          </div>
+        </div>
+        <div class="ir-sect">
+          <div class="ir-label">AI Activity</div>
+          <div class="ai-activity">
+            <div class="aa-item">✅ Welcome email sent <span style="color:var(--muted);">10:22</span></div>
+            <div class="aa-item">✅ CRM updated <span style="color:var(--muted);">10:22</span></div>
+            <div class="aa-item">📧 Seq started <span style="color:var(--muted);">10:22</span></div>
+            <div class="aa-item pending">⏳ Booking link pending</div>
+          </div>
+        </div>
+        <div class="ir-sect">
+          <div class="ir-label">Actions</div>
+          <div class="ir-actions">
+            <button class="ir-act p" onclick="showToast('📅 Booking link sent to Sarah!')">📅 Send Booking Link</button>
+            <button class="ir-act" onclick="showToast('📋 Added to GHL pipeline!')">📋 Add to GHL</button>
+            <button class="ir-act" onclick="nav('leads')">👥 View in CRM</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ PAGE: LEADS ════ -->
+<div class="page" id="pg-leads">
+  <div class="leads-header">
+    <h2>👥 Leads CRM</h2>
+    <div class="leads-filters">
+      <div class="lf active" onclick="toggleFilter(this)">All (247)</div>
+      <div class="lf" onclick="toggleFilter(this)">🔥 Hot (42)</div>
+      <div class="lf" onclick="toggleFilter(this)">📅 Booking (18)</div>
+      <div class="lf" onclick="toggleFilter(this)">💰 Closed (31)</div>
+      <div class="lf" onclick="toggleFilter(this)">💬 WhatsApp</div>
+      <div class="lf" onclick="toggleFilter(this)">📸 Instagram</div>
+    </div>
+  </div>
+  <div class="leads-kpis">
+    <div class="lkpi"><div class="lkpi-val" style="color:var(--a1);">247</div><div class="lkpi-lbl">Total Leads</div></div>
+    <div class="lkpi"><div class="lkpi-val" style="color:var(--a4);">42</div><div class="lkpi-lbl">Hot Leads 🔥</div></div>
+    <div class="lkpi"><div class="lkpi-val" style="color:var(--a2);">18</div><div class="lkpi-lbl">Booking Requests</div></div>
+    <div class="lkpi"><div class="lkpi-val" style="color:var(--a5);">31</div><div class="lkpi-lbl">Closed Won 💰</div></div>
+    <div class="lkpi"><div class="lkpi-val" style="color:var(--a3);">12.6%</div><div class="lkpi-lbl">Close Rate</div></div>
+  </div>
+  <div class="leads-grid" id="leads-grid"></div>
+</div>
+
+<!-- ════ PAGE: ANALYTICS ════ -->
+<div class="page" id="pg-analytics">
+  <div style="margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+    <div><h2 style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.2rem;font-weight:800;">📊 Analytics</h2><div style="font-size:.8rem;color:var(--muted3);margin-top:2px;">April 2026 · All clients combined</div></div>
+    <div style="display:flex;gap:8px;">
+      <div class="lf active">This Month</div><div class="lf">Last Month</div><div class="lf">All Time</div>
+    </div>
+  </div>
+  <div class="kpi-row" style="margin-bottom:20px;">
+    <div class="kpi"><div class="kpi-top"><div class="kpi-icon" style="background:rgba(57,255,158,0.1);">📈</div><span class="kpi-change up">↑ 31%</span></div><div class="kpi-val" style="color:var(--a1);">247</div><div class="kpi-lbl">Total Leads</div></div>
+    <div class="kpi"><div class="kpi-top"><div class="kpi-icon" style="background:rgba(0,212,255,0.1);">💬</div><span class="kpi-change up">↑ 24%</span></div><div class="kpi-val" style="color:var(--a2);">1,840</div><div class="kpi-lbl">AI Replies Sent</div></div>
+    <div class="kpi"><div class="kpi-top"><div class="kpi-icon" style="background:rgba(255,209,102,0.1);">💰</div><span class="kpi-change up">↑ 44%</span></div><div class="kpi-val" style="color:var(--a4);">$18.4k</div><div class="kpi-lbl">Revenue</div></div>
+    <div class="kpi"><div class="kpi-top"><div class="kpi-icon" style="background:rgba(199,125,255,0.1);">📧</div><span class="kpi-change up">38%</span></div><div class="kpi-val" style="color:var(--a5);">38%</div><div class="kpi-lbl">Email Open Rate</div></div>
+  </div>
+  <div class="analytics-grid">
+    <div class="an-card">
+      <h3>Leads by Channel</h3>
+      <div class="bar-chart">
+        <div class="bc-row"><span class="bc-lbl" style="color:var(--wa);">💬 WhatsApp</span><div class="bc-track"><div class="bc-fill" style="width:72%;background:var(--wa);height:8px;border-radius:8px;"></div></div><span class="bc-val" style="color:var(--wa);">89</span></div>
+        <div class="bc-row"><span class="bc-lbl" style="color:var(--ig);">📸 Instagram</span><div class="bc-track"><div class="bc-fill" style="width:58%;background:var(--ig);"></div></div><span class="bc-val" style="color:var(--ig);">72</span></div>
+        <div class="bc-row"><span class="bc-lbl" style="color:var(--fb);">📘 Messenger</span><div class="bc-track"><div class="bc-fill" style="width:40%;background:var(--fb);"></div></div><span class="bc-val" style="color:var(--fb);">49</span></div>
+        <div class="bc-row"><span class="bc-lbl" style="color:var(--web);">🌐 Web Chat</span><div class="bc-track"><div class="bc-fill" style="width:28%;background:var(--web);"></div></div><span class="bc-val" style="color:var(--web);">35</span></div>
+        <div class="bc-row"><span class="bc-lbl" style="color:var(--sms);">📱 SMS</span><div class="bc-track"><div class="bc-fill" style="width:16%;background:var(--sms);"></div></div><span class="bc-val" style="color:var(--sms);">20</span></div>
+      </div>
+    </div>
+    <div class="an-card">
+      <h3>Sales Funnel</h3>
+      <div class="funnel-chart">
+        <div class="fc-step" style="width:100%;background:rgba(57,255,158,0.1);"><span>👁️ Impressions</span><strong style="color:var(--a1);">12,400</strong></div>
+        <div class="fc-step" style="width:82%;background:rgba(0,212,255,0.08);"><span>🖱️ Clicks</span><strong style="color:var(--a2);">1,860</strong></div>
+        <div class="fc-step" style="width:60%;background:rgba(199,125,255,0.08);"><span>💬 Conversations</span><strong style="color:var(--a5);">480</strong></div>
+        <div class="fc-step" style="width:36%;background:rgba(255,209,102,0.08);"><span>📋 Leads</span><strong style="color:var(--a4);">247</strong></div>
+        <div class="fc-step" style="width:18%;background:rgba(57,255,158,0.06);"><span>💰 Closed</span><strong style="color:var(--a1);">31</strong></div>
+      </div>
+    </div>
+    <div class="an-card">
+      <h3>Monthly Revenue</h3>
+      <div class="revenue-chart" id="rev-chart"></div>
+      <div style="display:flex;justify-content:space-around;margin-top:4px;" id="rev-labels"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end .main -->
+</div><!-- end .shell -->
+
+<div id="toast">✅ Done!</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ─── NAV ───
+const pages = ['overview','launch','inbox','leads','analytics'];
+const titles = {overview:'🏠 Overview — NovaMind Business OS',launch:'⚡ AI Launcher — Build Sales Machine',inbox:'💬 Omnichannel Inbox — All Channels',leads:'👥 Leads CRM',analytics:'📊 Analytics'};
+
+function nav(id) {
+  pages.forEach(p => {
+    document.getElementById('pg-'+p).classList.toggle('active', p===id);
+    document.getElementById('rb-'+p).classList.toggle('active', p===id);
+  });
+  document.getElementById('tb-title').innerHTML = titles[id].replace(/(.*?) —/, '<span>$1</span> —');
+  if(id==='leads') renderLeads();
+  if(id==='analytics') renderRevChart();
+}
+
+// ─── OVERVIEW QUICK LAUNCH ───
+function quickLaunch() {
+  const v = document.getElementById('ov-url').value.trim();
+  if(!v){showToast('⚠️ Enter a URL or business name');return;}
+  document.getElementById('launch-url').value = v;
+  nav('launch');
+  setTimeout(runLaunch, 300);
+}
+
+// ─── STEP UI ───
+let step = 1;
+let selectedType = 'Beauty & Salon';
+
+// inject btype styles
+const btypeStyle = document.createElement('style');
+btypeStyle.textContent = `.btype{background:var(--s3);border:1px solid var(--border2);border-radius:50px;padding:5px 13px;font-size:.75rem;color:var(--muted3);cursor:pointer;transition:.2s;}.btype:hover{border-color:rgba(57,255,158,0.3);color:var(--a1);}.btype.active{background:rgba(57,255,158,0.1);border-color:rgba(57,255,158,0.3);color:var(--a1);}`;
+document.head.appendChild(btypeStyle);
+
+function switchStep(n) {
+  step = n;
+  document.getElementById('step-1').style.display = n===1 ? 'flex':'none';
+  document.getElementById('step-2').style.display = n===2 ? 'flex':'none';
+  document.getElementById('step-tab-1').style.cssText = n===1
+    ? 'flex:1;padding:12px;text-align:center;font-size:.78rem;font-weight:700;color:var(--a1);background:rgba(57,255,158,0.06);border-bottom:2px solid var(--a1);cursor:pointer;'
+    : 'flex:1;padding:12px;text-align:center;font-size:.78rem;font-weight:600;color:var(--muted2);cursor:pointer;';
+  document.getElementById('step-tab-2').style.cssText = n===2
+    ? 'flex:1;padding:12px;text-align:center;font-size:.78rem;font-weight:700;color:var(--a1);background:rgba(57,255,158,0.06);border-bottom:2px solid var(--a1);cursor:pointer;'
+    : 'flex:1;padding:12px;text-align:center;font-size:.78rem;font-weight:600;color:var(--muted2);cursor:pointer;';
+  document.getElementById('step-toggle-btn').textContent = n===1 ? '+ More Details' : '← Back';
+}
+
+function selectType(el, type) {
+  document.querySelectorAll('.btype').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  selectedType = type;
+}
+
+// ─── DEMO FILL ───
+const DEMOS2 = {
+  yoga: { desc:'Serenity Yoga Studio in Austin, TX. We offer yoga classes for all levels, 1-on-1 private sessions, group meditation, and wellness coaching. Classes cost $25 each or $150/month unlimited. Our target customers are women aged 25-45 who want to reduce stress, improve flexibility, and find inner calm. We currently get clients mainly through Instagram but want more consistent leads.', type:'Yoga & Wellness', city:'Austin, TX', price:'$25/class or $150/mo', target:'Women 25-45 seeking stress relief and wellness', usp:'Only studio combining hot yoga + guided meditation in one session' },
+  dental: { desc:'SmileCare Dental Clinic in Toronto. Family dentistry practice offering teeth cleaning, whitening, implants, Invisalign, and emergency dental care. Prices range from $150 for cleaning to $3,000 for implants. Target patients are families and professionals aged 25-55 who want painless, modern dental care. We rely mostly on word of mouth but want more new patients every month.', type:'Health & Dental', city:'Toronto, Canada', price:'$150–$3,000', target:'Families and professionals 25-55', usp:'Completely pain-free procedures with sedation dentistry option' },
+  gym: { desc:'IronForge Gym in Chicago. A premium fitness center with personal training, group classes (HIIT, spin, yoga), weight loss programs, 24/7 access, and nutrition coaching. Monthly memberships from $49 to $149. Our target market is working adults aged 20-45 who want real results. We run some Facebook ads but our conversion rate is low.', type:'Gym & Fitness', city:'Chicago, IL', price:'$49–$149/month', target:'Working adults 20-45 wanting real fitness results', usp:'Guaranteed results program — lose 10 lbs in 30 days or full refund' },
+  restaurant: { desc:'Casa Bella Italian Restaurant in New York City. Authentic Italian cuisine with house-made pasta, wood-fired pizza, and classic Italian desserts. We also offer private dining for events and full catering services. Average spend $40-60 per person. We want to attract more reservations for weekend dinners and private events through social media.', type:'Restaurant & Food', city:'New York, NY', price:'$40-60 per person', target:'Couples and groups looking for authentic Italian dining', usp:'100% authentic recipes from Naples — our chef trained in Italy for 8 years' },
+  realtor: { desc:'Premier Realty Group in Miami, FL. We help buyers and sellers with luxury homes, investment properties, and first-time buyers. Average home price $500k-$2M. We specialize in waterfront properties and have 15 years of experience. We want more qualified buyer leads from social media and Google.', type:'Real Estate', city:'Miami, FL', price:'Homes $500k–$2M', target:'High-income buyers and sellers 30-60', usp:'Local waterfront property specialists — sold 200+ homes over $1M' },
+  salon: { desc:'Glamour Hair Salon in Los Angeles. Full-service hair salon offering haircuts, color, balayage, keratin treatments, extensions, and bridal packages. Prices from $50 for a cut to $400 for full color. Our target clients are women aged 20-50 who care about their appearance and want a luxury salon experience. We want more Instagram leads converting into bookings.', type:'Beauty & Salon', city:'Los Angeles, CA', price:'$50–$400', target:'Style-conscious women 20-50', usp:'LA\'s top-rated balayage salon — featured in Vogue 2024' }
+};
+
+function fillLaunch(k) {
+  const d = DEMOS2[k];
+  if (!d) return;
+  document.getElementById('launch-desc').value = d.desc;
+  document.getElementById('launch-city').value = d.city || '';
+  document.getElementById('launch-price').value = d.price || '';
+  document.getElementById('launch-target').value = d.target || '';
+  document.getElementById('launch-usp').value = d.usp || '';
+  selectedType = d.type;
+  document.querySelectorAll('.btype').forEach(b => {
+    b.classList.toggle('active', b.textContent.includes(d.type.split(' ')[0]) || b.onclick?.toString().includes(d.type));
+  });
+  showToast('✅ Demo filled — hit ⚡ Build My Sales System!');
+}
+
+// ─── AI LAUNCHER ───
+let bizResult = {};
+
+function buildContext() {
+  const desc  = (document.getElementById('launch-desc')?.value || '').trim();
+  const url   = (document.getElementById('launch-url')?.value || '').trim();
+  const city  = (document.getElementById('launch-city')?.value || '').trim();
+  const price = (document.getElementById('launch-price')?.value || '').trim();
+  const target= (document.getElementById('launch-target')?.value || '').trim();
+  const usp   = (document.getElementById('launch-usp')?.value || '').trim();
+  const channels=(document.getElementById('launch-channels')?.value||'').trim();
+
+  let ctx = '';
+  if (url)      ctx += `Website URL: ${url}\n`;
+  if (desc)     ctx += `Business Description: ${desc}\n`;
+  if (selectedType) ctx += `Business Type: ${selectedType}\n`;
+  if (city)     ctx += `Location: ${city}\n`;
+  if (price)    ctx += `Pricing: ${price}\n`;
+  if (target)   ctx += `Target Customer: ${target}\n`;
+  if (usp)      ctx += `Unique Selling Point: ${usp}\n`;
+  if (channels) ctx += `Current Marketing Channels: ${channels}\n`;
+  return ctx.trim();
+}
+
+async function runLaunch() {
+  const context = buildContext();
+  const desc = (document.getElementById('launch-desc')?.value || '').trim();
+  if (!desc && !context) { showToast('⚠️ Please describe the business first'); return; }
+  if (!desc) { showToast('⚠️ Please fill in the Business Description field'); return; }
+
+  const btn = document.getElementById('launch-btn');
+  btn.disabled = true;
+  document.getElementById('lbtn-txt').innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(5,7,9,.3);border-top-color:#050709;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>Building your system...';
+  document.getElementById('launch-progress').style.display = 'block';
+  document.getElementById('launch-results').style.display = 'none';
+  document.getElementById('lp-log').innerHTML = '';
+  for (let i=1;i<=7;i++) document.getElementById('lpd'+i).classList.remove('active','done');
+
+  const steps = [
+    {pct:14,dot:'lpd1',title:'🔍 Reading business info...',msg:'Processing your business description',c:'go'},
+    {pct:28,dot:'lpd2',title:'🧠 Claude AI analyzing...',msg:'Extracting services, pricing, tone, ideal customers',c:'go'},
+    {pct:42,dot:'lpd3',title:'🏗️ Building sales funnel...',msg:'Writing headline, bullets, CTA, lead capture form',c:'go'},
+    {pct:57,dot:'lpd4',title:'📧 Writing email sequences...',msg:'Creating 5-part automated follow-up series',c:'go'},
+    {pct:71,dot:'lpd5',title:'📣 Creating ad campaigns...',msg:'Facebook, Instagram & Google ad copy',c:'go'},
+    {pct:85,dot:'lpd6',title:'🤖 Training AI chatbot...',msg:'Building conversation script from your business info',c:'go'},
+    {pct:100,dot:'lpd7',title:'✅ Everything is ready!',msg:'Your complete sales machine is live!',c:'ok'},
+  ];
+
+  for (let i=0; i<steps.length; i++) {
+    const s = steps[i];
+    await sleep(i===1 ? 200 : 600);
+    document.getElementById('lp-fill').style.width = s.pct+'%';
+    document.getElementById('lp-pct').textContent = s.pct+'%';
+    document.getElementById('lp-title').textContent = s.title;
+    document.getElementById(s.dot).classList.add('active');
+    if (i>0) document.getElementById(steps[i-1].dot).classList.replace('active','done');
+    addLpLog(s.msg, s.c);
+
+    if (i===1) {
+      addLpLog('Sending to Claude AI...','go');
+      try {
+        bizResult = await callAI(context);
+        addLpLog('✓ Business intelligence extracted successfully','ok');
+      } catch(e) {
+        bizResult = fallback(context);
+        addLpLog('Built-in analysis used (API issue: '+e.message+')','ok');
+      }
+    }
+  }
+
+  await sleep(400);
+  renderResults();
+  document.getElementById('launch-progress').style.display = 'none';
+  document.getElementById('launch-results').style.display = 'block';
+  btn.disabled = false;
+  document.getElementById('lbtn-txt').textContent = '⚡ Build My Sales System';
+  showToast('🎉 Your sales machine is ready!');
+}
+
+async function callAI(context) {
+  const prompt = `You are a world-class marketing strategist. A business owner has provided the following details about their business. Use ALL of this information to create a highly personalized, accurate marketing system. Do NOT use generic copy — make everything specific to this exact business.
+
+BUSINESS INFORMATION:
+${context}
+
+Respond ONLY with a valid JSON object (no markdown, no backticks, no extra text). Use this exact structure:
+{"name":"exact business name from description","emoji":"most relevant emoji","type":"business category","description":"2 specific sentences about this business using their actual details","target":"specific ideal customer based on their info","services":["specific service 1","specific service 2","specific service 3","specific service 4"],"usp":"their unique selling point","projections":{"leads":"realistic range for this business type","conversion":"realistic %","revenue":"realistic monthly estimate","roi":"realistic %"},"funnel":{"headline":"powerful specific headline mentioning their actual service/outcome/location","subheadline":"specific supporting line with their USP","bullets":["specific benefit 1 with detail","specific benefit 2 with detail","specific benefit 3 with detail"],"cta":"specific action CTA","urgency":"specific urgency line"},"emails":[{"day":0,"subject":"personalized subject using their business name","preview":"first 2 sentences..."},{"day":1,"subject":"subject","preview":"first 2 sentences..."},{"day":3,"subject":"subject","preview":"first 2 sentences..."},{"day":5,"subject":"subject","preview":"first 2 sentences..."},{"day":7,"subject":"subject","preview":"first 2 sentences..."}],"ads":[{"platform":"Facebook","emoji":"📘","headline":"specific ad headline","copy":"2 sentences using their actual service/price/location","cta":"CTA","budget":"$15/day"},{"platform":"Instagram","emoji":"📸","headline":"specific headline","copy":"2 sentences","cta":"CTA","budget":"$10/day"},{"platform":"Google","emoji":"🔍","headline":"specific search headline","copy":"2 sentences","cta":"CTA","budget":"$20/day"}],"followup":[{"icon":"🎯","title":"Lead Captured","desc":"specific to their business","timing":"Instant"},{"icon":"⚡","title":"Owner Alert","desc":"desc","timing":"0 sec"},{"icon":"📧","title":"Welcome Email","desc":"desc","timing":"Instant"},{"icon":"📱","title":"SMS","desc":"desc","timing":"1 hour"},{"icon":"🔁","title":"Nurture","desc":"desc","timing":"Days 1-7"},{"icon":"📅","title":"Booking","desc":"desc","timing":"Day 3"},{"icon":"💰","title":"Close","desc":"desc","timing":"Day 7"}],"agentScript":{"greeting":"personalized greeting mentioning their business","q1":"qualifying question specific to their service","q2":"second qualifying question","leadAsk":"natural ask for contact info","closing":"personalized closing message"}}`;
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  if (!res.ok) throw new Error(`API ${res.status}`);
+  const d = await res.json();
+  const raw = d.content.map(b => b.text||'').join('');
+  return JSON.parse(raw.replace(/```json|```/g,'').trim());
+}
+
+function fallback(input){
+  const l=input.toLowerCase();
+  const isYoga=l.includes('yoga'),isDental=l.includes('dental'),isGym=l.includes('gym')||l.includes('fitness'),isFood=l.includes('restaurant')||l.includes('food'),isSalon=l.includes('salon')||l.includes('hair'),isReal=l.includes('real')||l.includes('realt');
+  const name=isYoga?'Serenity Yoga Studio':isDental?'SmileCare Dental':isGym?'IronForge Gym':isFood?'Casa Bella Restaurant':isSalon?'Glamour Hair Salon':isReal?'Premier Realty':'Your Business';
+  const emoji=isYoga?'🧘':isDental?'🦷':isGym?'💪':isFood?'🍕':isSalon?'💇':isReal?'🏠':'🏢';
+  const type=isYoga?'Wellness':isDental?'Healthcare':isGym?'Fitness':isFood?'Restaurant':isSalon?'Beauty':isReal?'Real Estate':'Local Business';
+  return{name,emoji,type,description:`${name} is a trusted local business delivering exceptional results with a personalized approach.`,target:'Local adults 25–55 seeking quality services',services:['Core Service','Premium Package','Group/Family','Consultation'],usp:'Results guaranteed or your money back',projections:{leads:'40–70',conversion:'11%',revenue:'$3,800',roi:'290%'},funnel:{headline:`Get Real Results with ${name} — Guaranteed in 30 Days`,subheadline:'Join 500+ happy customers who transformed their lives with us.',bullets:['✅ Expert team with 10+ years experience','✅ Flexible scheduling that fits your life','✅ 100% satisfaction guarantee'],cta:'Claim Your Free Consultation →',urgency:'⏰ Only 5 spots left this week'},emails:[{day:0,subject:`Welcome to ${name}! Here's your next step`,preview:'Thank you for reaching out! We\'re thrilled to help you. Inside you\'ll find everything to get started today.'},{day:1,subject:'Quick question for you...',preview:'What\'s your biggest challenge right now? This helps us create a truly personalized plan just for you.'},{day:3,subject:'See how [client] transformed their life',preview:'Meet someone just like you who came to us 6 months ago feeling stuck. Here\'s exactly what changed.'},{day:5,subject:'Free gift inside 🎁',preview:'As a thank-you for your interest, we prepared a FREE resource that helps you immediately.'},{day:7,subject:'Last chance — offer expires tonight',preview:'This is your final reminder about our special welcome offer. After tonight, it goes back to full price.'}],ads:[{platform:'Facebook',emoji:'📘',headline:`${name} — Limited Spots`,copy:'Tired of not getting results? Guaranteed results in 30 days or money back. 500+ happy customers.',cta:'Book Free Consultation',budget:'$15/day'},{platform:'Instagram',emoji:'📸',headline:'Transform Your Life This Month',copy:'Real results. Real people. Swipe to see transformations. Limited spots available this month.',cta:'See Results',budget:'$10/day'},{platform:'Google',emoji:'🔍',headline:`Best ${type} Near Me`,copy:'Top-rated local business. 500+ 5-star reviews. Book free consultation — no commitment.',cta:'Book Now',budget:'$20/day'}],followup:[{icon:'🎯',title:'Lead Captured',desc:'Visitor submits name, email, phone via AI chat',timing:'Instant'},{icon:'⚡',title:'WhatsApp Alert',desc:'Owner notified immediately with lead details',timing:'0 seconds'},{icon:'📧',title:'Welcome Email',desc:'Personalized welcome with free consultation offer',timing:'Instant'},{icon:'📱',title:'SMS Follow-Up',desc:'Personal text message starts conversation',timing:'1 hour'},{icon:'🔁',title:'Nurture Sequence',desc:'7-day educational email series builds trust',timing:'Days 1–7'},{icon:'📅',title:'Booking Link Sent',desc:'Calendar link to book free consultation',timing:'Day 3'},{icon:'💰',title:'Close & Convert',desc:'Final offer with urgency and new client discount',timing:'Day 7'}],agentScript:{greeting:`Hi! 👋 Welcome to ${name}. I'm your AI assistant. What brings you here today?`,q1:'Great! Are you looking for help for yourself or someone else?',q2:"What's the biggest challenge you're hoping we can solve for you?",leadAsk:'I\'d love to connect you with our team. Can I get your name and email?',closing:"You're all set! 🎉 Check your inbox — your free guide is on its way!"}};
+}
+
+function renderResults(){
+  const d=bizResult;
+  document.getElementById('res-biz').innerHTML=`<div class="res-emoji">${d.emoji}</div><div><div class="res-name">${d.name}</div><span class="res-type">${d.type}</span><div class="res-desc">${d.description}</div><div class="res-proj"><div class="rp-chip"><div class="rp-chip-val">${d.projections.leads}</div><div class="rp-chip-lbl">Leads/mo</div></div><div class="rp-chip"><div class="rp-chip-val">${d.projections.conversion}</div><div class="rp-chip-lbl">Conv. Rate</div></div><div class="rp-chip"><div class="rp-chip-val">${d.projections.revenue}</div><div class="rp-chip-lbl">Revenue</div></div><div class="rp-chip"><div class="rp-chip-val">${d.projections.roi}</div><div class="rp-chip-lbl">ROI</div></div></div></div>`;
+  // Funnel
+  const f=d.funnel||{};
+  document.getElementById('rt-funnel').innerHTML=`<div class="funnel-mock"><div class="fm-bar"><div class="fm-dots"><span></span><span></span><span></span></div><div class="fm-url">🔒 ${(d.name||'').toLowerCase().replace(/\s+/g,'')}.com/free-offer</div></div><div class="fm-body"><div style="font-size:.7rem;color:var(--a1);margin-bottom:8px;font-weight:700;">⚡ AI-GENERATED FUNNEL PAGE</div><div class="fm-headline">${f.headline||''}</div><div class="fm-sub">${f.subheadline||''}</div><div class="fm-bullets">${(f.bullets||[]).map(b=>`<div class="fm-bullet">${b}</div>`).join('')}</div><div class="fm-urgency">${f.urgency||''}</div><div class="fm-form"><input class="fm-input" placeholder="Your Name" readonly><input class="fm-input" placeholder="Email Address" readonly><input class="fm-input" placeholder="Phone Number" readonly><button class="fm-btn">${f.cta||'Get Started →'}</button></div></div></div>`;
+  // Emails
+  document.getElementById('rt-emails').innerHTML=`<div class="email-cards">${(d.emails||[]).map(e=>`<div class="ec"><div class="ec-day"><div class="n">${e.day}</div><div class="l">Day ${e.day}</div></div><div class="ec-body"><div class="ec-subj">📧 ${e.subject}</div><div class="ec-prev">${e.preview}</div></div><span class="ec-badge">Auto</span></div>`).join('')}</div>`;
+  // Ads
+  document.getElementById('rt-ads').innerHTML=`<div class="ads-grid">${(d.ads||[]).map(a=>`<div class="ad-c"><div class="ad-plat">${a.emoji} ${a.platform}</div><div class="ad-body2"><div class="ad-h">${a.headline}</div><div class="ad-copy">${a.copy}</div><div class="ad-footer"><span class="ad-cta2">${a.cta}</span><span class="ad-bud">${a.budget}</span></div></div></div>`).join('')}</div>`;
+  // Follow-up
+  document.getElementById('rt-followup').innerHTML=`<div class="flow-stack">${(d.followup||[]).map((f,i,arr)=>`<div class="fn"><div class="fn-line"><div class="fn-ico">${f.icon}</div>${i<arr.length-1?'<div class="fn-conn"></div>':''}</div><div class="fn-content"><h4>${f.title}</h4><p>${f.desc}</p><div class="fn-timing">⏱ ${f.timing}</div></div></div>`).join('')}</div>`;
+  // Agent
+  const s=d.agentScript||{};
+  const msgs=[{out:false,t:s.greeting},{out:true,t:'Hi, I saw your ad and want to learn more'},{out:false,t:s.q1},{out:true,t:"I'm looking for something that actually works"},{out:false,t:s.q2},{out:true,t:"I've tried other places without results"},{out:false,t:s.leadAsk},{out:true,t:'Sure! John Smith, john@email.com'},{out:false,t:s.closing}];
+  document.getElementById('rt-agent').innerHTML=`<div class="agent-grid"><div><div style="font-size:.72rem;color:var(--muted3);margin-bottom:10px;">💬 Conversation Preview</div><div class="agent-chat">${msgs.map(m=>`<div class="ac-msg ${m.out?'out':'in'}"><div class="ac-ava" style="background:${m.out?'linear-gradient(135deg,#4ade80,#22d3ee)':'linear-gradient(135deg,var(--a1),var(--a2))'};">${m.out?'👤':'AI'}</div><div class="ac-bub">${m.t||''}</div></div>`).join('')}</div></div><div><div style="font-size:.72rem;color:var(--muted3);margin-bottom:10px;">⚙️ Script Config</div><div class="agent-config">${[['Greeting',s.greeting],['Qualify Q1',s.q1],['Qualify Q2',s.q2],['Lead Ask',s.leadAsk],['Closing',s.closing]].map(([l,v])=>`<div class="agent-cfg-item"><div class="lbl">${l}</div><div class="val">${v||'—'}</div></div>`).join('')}</div></div></div>`;
+}
+
+function switchRTab(n,el){document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.rtab-panel').forEach(p=>p.classList.remove('active'));el.classList.add('active');document.getElementById('rt-'+n).classList.add('active');}
+function addLpLog(msg,c=''){const l=document.getElementById('lp-log');const t=new Date().toLocaleTimeString('en',{hour:'2-digit',minute:'2-digit',second:'2-digit'});l.innerHTML+=`<div class="ll"><span class="ll-t">${t}</span><span class="ll-m ${c}">${msg}</span></div>`;l.scrollTop=9999;}
+function resetLaunch(){document.getElementById('launch-url').value='';document.getElementById('launch-progress').style.display='none';document.getElementById('launch-results').style.display='none';}
+
+// ─── INBOX ───
+const convos=[
+  {id:1,name:'Sarah Mitchell',init:'SM',grad:'linear-gradient(135deg,#4ade80,#22d3ee)',ch:'whatsapp',ce:'💬',cc:var_wa,prev:'A call sounds great! What days work? 😊',time:'2m',tags:['it-ai','it-hot'],unread:true},
+  {id:2,name:'James Kowalski',init:'JK',grad:'linear-gradient(135deg,#f472b6,#a855f7)',ch:'instagram',ce:'📸',cc:'#e1306c',prev:'Hey messaged you from the Reel!',time:'8m',tags:['it-ai','it-new'],unread:true},
+  {id:3,name:'Priya Nair',init:'PN',grad:'linear-gradient(135deg,#60a5fa,#3b82f6)',ch:'facebook',ce:'📘',cc:'#1877f2',prev:'What are your prices for the basic plan?',time:'14m',tags:['it-you'],unread:false},
+  {id:4,name:'Carlos Rivera',init:'CR',grad:'linear-gradient(135deg,#fbbf24,#f59e0b)',ch:'web',ce:'🌐',cc:'#f59e0b',prev:"Just filled out your form on the website",time:'31m',tags:['it-ai'],unread:false},
+  {id:5,name:'Amy Thompson',init:'AT',grad:'linear-gradient(135deg,#a78bfa,#8b5cf6)',ch:'sms',ce:'📱',cc:'#a78bfa',prev:"Got your SMS — yes I'm interested!",time:'1h',tags:['it-hot'],unread:false},
+  {id:6,name:'Marcus Lee',init:'ML',grad:'linear-gradient(135deg,#34d399,#10b981)',ch:'whatsapp',ce:'💬',cc:'#25d366',prev:'Can I get a demo of the product?',time:'2h',tags:['it-ai'],unread:false},
+];
+function var_wa(){return'#25d366';}
+
+function renderInboxConvs(filter='all'){
+  const list=document.getElementById('iconv-list');
+  const filtered=filter==='all'?convos:convos.filter(c=>c.ch===filter);
+  const tlabel={'it-ai':'🤖 AI','it-hot':'🔥','it-new':'New','it-you':'👤 You'};
+  list.innerHTML=filtered.map((c,i)=>`<div class="iconv ${i===0?'active':''}" onclick="selectConvo(${c.id},this)">
+    ${c.unread?'<div class="iconv-unread"></div>':''}
+    <div class="iconv-ava" style="background:${c.grad};width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;position:relative;">
+      ${c.init}<div class="iconv-ch" style="background:${c.cc};">${c.ce}</div></div>
+    <div class="iconv-body">
+      <div class="iconv-r1"><div class="iconv-name ${c.unread?'':''}">  ${c.name}</div><div class="iconv-time">${c.time}</div></div>
+      <div class="iconv-prev">${c.prev}</div>
+      <div class="iconv-tags">${c.tags.map(t=>`<span class="it ${t}">${tlabel[t]||t}</span>`).join('')}</div>
+    </div></div>`).join('');
+}
+renderInboxConvs();
+
+function filterInbox(ch,el){document.querySelectorAll('.ic-item').forEach(i=>i.classList.remove('active'));el.classList.add('active');renderInboxConvs(ch);}
+function selectConvo(id,el){document.querySelectorAll('.iconv').forEach(i=>i.classList.remove('active'));el.classList.add('active');const c=convos.find(x=>x.id===id);showToast(`💬 ${c.name} via ${c.ce}`);}
+
+let inboxAI=true;
+function inboxToggleTakeover(){
+  inboxAI=!inboxAI;
+  const banner=document.getElementById('i-mode-banner');
+  const ind=document.getElementById('i-ai-ind');
+  const btn=document.getElementById('i-takeover');
+  if(inboxAI){
+    banner.className='mode-banner mb-ai';
+    banner.innerHTML='<div class="mb-text">🤖 <strong>AI is handling this</strong> — qualifying Sarah and going for the booking.</div><button class="mb-switch" onclick="inboxToggleTakeover()">Take over →</button>';
+    ind.className='ai-ind'; ind.innerHTML='<span class="dot"></span> AI';
+    btn.textContent='👤 Take Over';
+    showToast('🤖 AI mode on — handling automatically');
+  } else {
+    banner.className='mode-banner mb-human';
+    banner.innerHTML='<div class="mb-text">👤 <strong style="color:var(--a2);">You are handling this</strong> — AI draft suggestions shown below.</div><button class="mb-switch" onclick="inboxToggleTakeover()">← Back to AI</button>';
+    ind.innerHTML='👤 You'; ind.style.cssText='display:flex;align-items:center;gap:5px;background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.18);border-radius:50px;padding:4px 11px;font-size:.72px;color:var(--a2);font-size:.72rem;';
+    btn.textContent='🤖 Hand to AI';
+    showToast('👤 You took over — AI drafts available below');
+  }
+}
+
+function inboxInsert(t){document.getElementById('i-input').value=t;document.getElementById('i-input').focus();}
+function inboxSend(){
+  const input=document.getElementById('i-input');
+  const txt=input.value.trim();
+  if(!txt)return;
+  const msgs=document.getElementById('i-msgs');
+  const typing=document.getElementById('i-typing');
+  const cls=inboxAI?'ai-out':'human-out';
+  const lbl=inboxAI?'<span class="mlbl mlbl-ai">🤖 AI</span>':'<span class="mlbl mlbl-h">👤 You</span>';
+  const bg=inboxAI?'linear-gradient(135deg,var(--a1),var(--a2))':'linear-gradient(135deg,#60a5fa,#3b82f6)';
+  const av=inboxAI?'AI':'T';
+  const div=document.createElement('div');
+  div.className=`mw out ${cls}`;
+  div.innerHTML=`<div><div class="m-bub">${txt}</div><div class="m-meta">${lbl} Just now</div></div><div class="m-ava" style="background:${bg};width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;">${av}</div>`;
+  msgs.insertBefore(div,typing);
+  input.value=''; input.style.height='auto';
+  msgs.scrollTop=9999;
+  document.getElementById('i-draft').style.display='flex';
+}
+
+function useDraft(){document.getElementById('i-input').value="Amazing! Just sent a booking link — pick any slot: calendly.com/novamind/free-call 📅 Can't wait to help!";document.getElementById('i-draft').style.display='none';document.getElementById('i-input').focus();}
+function regenInboxDraft(){
+  const opts=['"Great! Here are my open slots this week: [Calendly link]. Takes 2 min to book 📅"','"Perfect! Sending a quick scheduling link now — pick whatever works best 🗓️"','"Awesome! Let me send you that link right now. Totally free, zero obligation 😊"'];
+  document.querySelector('.db-text').innerHTML=`<strong>AI Draft:</strong> ${opts[Math.floor(Math.random()*opts.length)]}`;
+  showToast('↺ Draft regenerated');
+}
+
+// ─── LEADS ───
+const leadsData=[
+  {name:'Sarah Mitchell',init:'SM',grad:'linear-gradient(135deg,#4ade80,#22d3ee)',biz:'Yoga Studio',email:'sarah@serenity-yoga.com',phone:'+1 555 014 2938',ch:'💬 WhatsApp',source:'Instagram Ad',score:92,stage:'Booking',stageC:'var(--a1)',tags:['🔥 Hot','🤖 AI']},
+  {name:'James Kowalski',init:'JK',grad:'linear-gradient(135deg,#f472b6,#a855f7)',biz:'E-commerce',email:'jk@gmail.com',phone:'+1 555 028 7431',ch:'📸 Instagram',source:'Reel Comment',score:78,stage:'Contacted',stageC:'var(--a2)',tags:['New','🤖 AI']},
+  {name:'Priya Nair',init:'PN',grad:'linear-gradient(135deg,#60a5fa,#3b82f6)',biz:'Coaching',email:'priya@email.com',phone:'+1 555 036 4829',ch:'📘 Messenger',source:'Facebook Ad',score:65,stage:'Qualified',stageC:'var(--a5)',tags:['👤 You']},
+  {name:'Carlos Rivera',init:'CR',grad:'linear-gradient(135deg,#fbbf24,#f59e0b)',biz:'Restaurant',email:'carlos@casabella.com',phone:'+1 555 049 1234',ch:'🌐 Web Chat',source:'Google Ad',score:88,stage:'Closed 💰',stageC:'var(--a4)',tags:['🔥 Hot']},
+  {name:'Amy Thompson',init:'AT',grad:'linear-gradient(135deg,#a78bfa,#8b5cf6)',biz:'Fitness',email:'amy@gmail.com',phone:'+1 555 051 8765',ch:'📱 SMS',source:'Referral',score:71,stage:'Booking',stageC:'var(--a1)',tags:['🔥 Hot','New']},
+  {name:'Marcus Lee',init:'ML',grad:'linear-gradient(135deg,#34d399,#10b981)',biz:'SaaS',email:'marcus@company.com',phone:'+1 555 063 4521',ch:'💬 WhatsApp',source:'Cold outreach',score:55,stage:'New',stageC:'var(--muted3)',tags:['🤖 AI']},
+];
+
+function renderLeads(){
+  document.getElementById('leads-grid').innerHTML=leadsData.map(l=>`
+    <div class="lead-card">
+      <div class="lc-top">
+        <div class="lc-ava" style="background:${l.grad};">${l.init}</div>
+        <div><div class="lc-name">${l.name}</div><div class="lc-biz">${l.biz}</div></div>
+      </div>
+      <div class="lc-rows">
+        <div class="lcr">📧 ${l.email}</div>
+        <div class="lcr">📱 ${l.phone}</div>
+        <div class="lcr">${l.ch} · ${l.source}</div>
+      </div>
+      <div class="lc-bottom">
+        <div class="lc-score" style="color:${l.stageC};">⬤ ${l.stage}</div>
+        <div class="lc-actions">
+          <div class="lca p" onclick="nav('inbox');showToast('💬 Opening ${l.name}...')">💬</div>
+          <div class="lca" onclick="showToast('📅 Booking link sent to ${l.name}!')">📅</div>
+          <div class="lca" onclick="showToast('📋 ${l.name} added to GHL!')">GHL</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ─── ANALYTICS CHART ───
+function renderRevChart(){
+  const months=['Oct','Nov','Dec','Jan','Feb','Mar','Apr'];
+  const vals=[4200,5800,7100,9400,12000,15600,18400];
+  const max=Math.max(...vals);
+  const c=document.getElementById('rev-chart');
+  const cl=document.getElementById('rev-labels');
+  if(!c)return;
+  c.innerHTML=vals.map((v,i)=>`<div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:4px;"><div class="rv-bar" style="height:${Math.round((v/max)*72)+8}px;b
